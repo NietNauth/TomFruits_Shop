@@ -1,0 +1,55 @@
+@use '@styles/mixin.module.scss' as *;
+
+.container {
+  margin-top: -70px;
+  padding: 0 40px;
+  position: relative;
+  z-index: 10;
+
+  @include flex_box_custom(space-between, center, 25px);
+}
+
+.containerCard {
+  @include flex_box_custom(flex-start, center, 15px);
+
+  flex: 1;
+  padding: 20px 25px;
+  border-radius: 16px;
+
+  background: linear-gradient(135deg, #0aa84f, #087f3a);
+  color: #fff;
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+
+  @include flex_box_custom(center, center, 0);
+
+  background: rgba(255, 255, 255, 0.15);
+  font-size: 22px;
+}
+
+.containerContent {
+  @include flex_box_custom(center, flex-start, 6px);
+  flex-direction: column;
+
+  .title {
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  .des {
+    font-size: 14px;
+    opacity: 0.9;
+  }
+}

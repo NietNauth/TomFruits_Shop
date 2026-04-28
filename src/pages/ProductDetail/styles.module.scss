@@ -1,0 +1,291 @@
+@use '@styles/variable.module.scss' as *;
+@use '@styles/mixin.module.scss' as *;
+.container {
+  padding-top: 83px;
+  padding-left: 20px; // căn đều padding trái phải cho toàn bộ container
+  padding-right: 20px;
+  padding-bottom: 50px;
+  box-sizing: border-box;
+  .navigateSection {
+    @include flex_box_custom(space-between, center, 0px);
+    font-size: 14px;
+    font-weight: 300;
+    padding: 10px 0;
+  }
+  .contentSection {
+    @include flex_box_custom(unset, flex-start, 0px);
+    gap: 20px;
+  }
+  .imageBox {
+    max-width: 610px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 430px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .tag {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: #22c55e;
+      color: #fff;
+      padding: 2px 5px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    .discount {
+      position: absolute;
+      top: 50px;
+      left: 15px;
+      background: #ef4444;
+      color: #fff;
+      padding: 2px 5px;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    .heart {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #fff;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+  }
+  .infoBox {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; // canh trái toàn bộ nội dung bên trong
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    h1 {
+      font-size: 32px;
+      margin: 0 0 12px 0;
+      font-weight: 600;
+      padding: 0;
+      line-height: 1.2;
+    }
+    .price {
+      margin: 10px 0;
+    }
+
+    .currentPrice {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      h2 {
+        color: #16a34a;
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      span {
+        color: #666;
+        font-size: 16px;
+      }
+    }
+
+    .priceSub {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 5px;
+    }
+
+    .oldPrice {
+      text-decoration: line-through;
+      color: #9ca3af;
+      font-size: 16px;
+    }
+
+    .save {
+      color: #ef4444;
+      font-size: 16px;
+    }
+    .qtyWrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .qtyLabel {
+      font-size: 16px;
+      font-weight: 500;
+      color: #374151;
+    }
+    .qtyBox {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 140px; // tăng chiều rộng (tuỳ chỉnh 140–180px)
+      height: 37px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 5px 0;
+
+      button {
+        border: none;
+        background: none;
+        padding: 8px 14px;
+        cursor: pointer;
+      }
+
+      span {
+        padding: 0 10px;
+      }
+    }
+    .totalBar {
+      margin-top: 20px;
+      padding: 12px 16px;
+      border-top: 1px solid #e5e7eb;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+
+      .totalBar p {
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .totalBar b {
+        color: #16a34a;
+      }
+    }
+
+    /* BUTTON */
+    .btn {
+      display: flex;
+      gap: 15px;
+      margin: 20px 0;
+      width: 100%;
+      font-size: 15px;
+    }
+
+    .btnPrimary {
+      flex: 1;
+      background: #16a34a;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .btnOutline {
+      flex: 1;
+      border: 2px solid #16a34a;
+      color: #16a34a;
+      background: transparent;
+      padding: 10px 20px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .features {
+      display: flex;
+      gap: 20px;
+
+      span {
+        min-width: 180px;
+        flex: 1;
+        background: #f5f5f5;
+        border-radius: 12px;
+        padding: 10px 0;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #555;
+
+        // icon (dòng trên)
+        &::before {
+          content: attr(data-icon);
+          color: #22c55e;
+          font-size: 18px;
+          margin-bottom: 4px;
+        }
+      }
+    }
+  }
+  /* TABS */
+  .tabs {
+    margin-top: 30px;
+
+    .tabHeader {
+      display: flex;
+      gap: 20px;
+      border-bottom: 1px solid #ddd;
+
+      span {
+        padding: 10px;
+        cursor: pointer;
+        color: #666;
+      }
+    }
+
+    .active {
+      color: #16a34a;
+      border-bottom: 2px solid #16a34a;
+    }
+
+    .tabContent {
+      padding: 15px 0;
+      color: #444;
+      text-align: left;
+      line-height: 1.6;
+      font-size: 16px;
+      color: #1a1a1a;
+    }
+  }
+  .richText {
+    ul, ol {
+      padding-left: 20px;
+      margin: 10px 0;
+    }
+    li {
+      margin-bottom: 5px;
+    }
+    strong {
+      font-weight: 700;
+    }
+    h1, h2, h3 {
+      margin: 10px 0;
+      color: #1a1a1a;
+    }
+    p {
+      margin-bottom: 10px;
+    }
+  }
+  .nutriBox {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    p {
+      font-size: 16px;
+      color: #1a1a1a;
+      line-height: 1.7;
+    }
+  }
+  .related {
+    margin-top: 30px;
+  }
+}

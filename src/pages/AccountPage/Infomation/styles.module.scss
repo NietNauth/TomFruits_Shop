@@ -1,0 +1,142 @@
+.box {
+  padding: 4px 0px;
+  width: 700px;
+}
+
+.boxHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.successBadge {
+  color: #16a34a;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: fadeIn 0.3s ease;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h3 {
+  text-align: left;
+  margin-bottom: 24px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #222;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  text-align: left;
+}
+
+.field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  max-width: 350px;
+
+  label {
+    font-size: 14px;
+    color: #666;
+  }
+}
+
+input,
+select {
+  width: 300px;
+  padding: 12px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fff;
+  transition: 0.2s;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+  }
+}
+
+// Input khi có lỗi
+.inputError {
+  border-color: #e53e3e !important;
+  background: #fff5f5 !important;
+
+  &:focus {
+    border-color: #e53e3e !important;
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1) !important;
+  }
+}
+
+// Thông báo lỗi inline
+.errorMsg {
+  color: #e53e3e;
+  font-size: 0.78rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &::before {
+    content: '⚠';
+    font-size: 0.75rem;
+  }
+}
+
+.saveBtn {
+  margin-top: 10px;
+  background: #16a34a;
+  color: #fff;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+  width: 130px;
+  align-self: start;
+
+  &:hover {
+    background: #15803d;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}

@@ -1,0 +1,183 @@
+.card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: 0.3s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid #f0f0f0;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.imageWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; // Giữ tỉ lệ hình ảnh luôn là hình vuông
+  overflow: hidden;
+  background-color: #f9f9f9;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.3s;
+  }
+
+  .soldOutOverlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    
+    span {
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+  }
+}
+.card:hover img {
+  transform: scale(1.05);
+}
+
+.tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #22c55e;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1;
+}
+.discount {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #ef4444;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1;
+}
+.tag + .discount {
+  top: 38px; // nằm dưới tag
+}
+.heart {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* ===== CONTENT ===== */
+.contentBox {
+  padding: 12px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  flex: 1; // Chiếm toàn bộ phần còn lại của card
+}
+
+.categoryText {
+  color: #16a34a;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.content {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; // Giới hạn tên sản phẩm trong 2 dòng
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 48px; // 2 lines * 24px line-height (xấp xỉ)
+  line-height: 24px;
+}
+
+.unitText {
+  font-size: 12px;
+  color: #555;
+  background: #f5f5f5;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-bottom: auto; // Đẩy phần giá xuống dưới cùng
+  width: fit-content;
+}
+
+.starActive {
+  color: #facc15;
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: 10px;
+}
+
+.priceText {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.oldPriceText {
+  text-decoration: line-through;
+  color: #aaa;
+  font-size: 13px;
+}
+
+/* ===== BUTTON ===== */
+.btn {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+
+  &:hover {
+    background: #15803d;
+  }
+}
+@media (max-width: 1024px) {
+  .list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .list {
+    grid-template-columns: 1fr;
+  }
+}

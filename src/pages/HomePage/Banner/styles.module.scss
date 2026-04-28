@@ -1,0 +1,39 @@
+.container {
+  background-image: url('@/assets/images/banner_Tom.jpg');
+  width: 100%;
+  min-height: 55vh;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  padding: 50px 70px;
+  background-position: center;
+}
+
+.content {
+  position: absolute;
+  color: #fff;
+  z-index: 2; // nằm trên overlay
+  max-width: 600px;
+  left: 30px; // kéo sát trái
+  top: 50%;
+  transform: translateY(-50%); // căn giữa dọc
+  text-align: left;
+  // margin-left: 60px;
+  // margin-bottom: 120px;
+}
+.title {
+  font-size: 48px;
+  font-weight: bold;
+  line-height: 1.2;
+  margin-bottom: 20px;
+  color: #fff;
+}
+.des {
+  font-size: 16px;
+  margin-bottom: 30px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}

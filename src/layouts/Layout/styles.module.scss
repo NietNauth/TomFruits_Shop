@@ -1,0 +1,13 @@
+.wrapLayout {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+.container {
+  width: 100%;
+  // min-height: 10vh;
+  max-width: 1250px;
+  // height: auto;
+  // overflow: visible;
+}

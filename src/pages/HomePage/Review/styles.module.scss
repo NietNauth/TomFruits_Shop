@@ -1,0 +1,83 @@
+.container {
+  margin: 40px 0;
+  background: #0b8f3c;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.header {
+  margin-bottom: 40px;
+}
+
+.title {
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: #d4f5df;
+  font-size: 16px;
+}
+
+.list {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* CARD */
+.card {
+  background: #f9fafb;
+  border-radius: 20px;
+  padding: 24px;
+  width: 320px;
+  text-align: left;
+}
+
+.stars {
+  color: #facc15;
+  margin-bottom: 10px;
+
+  svg {
+    margin-right: 2px;
+  }
+}
+
+.contentText {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* USER */
+.user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatarBox {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #c7f0d8;
+  color: #0b8f3c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.nameText {
+  font-weight: 600;
+  color: #111827;
+}
