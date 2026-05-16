@@ -1,6 +1,42 @@
 Cart IDs: 27
 Item: Xoài Cát Hòa Lộc (Loại 1), Price: 145000.00, Qty: 1, Subtotal: 145000, Running Total: 145000
 Created OrderItem ID: 12 for Order ID: 10, Product: Xoài Cát Hòa Lộc (Loại 1)
+Cart IDs: 27
+Item: Táo Envy Mỹ Size 70-80, Price: 195000.00, Qty: 1, Subtotal: 195000, Running Total: 195000
+Created OrderItem ID: 12 for Order ID: 10, Product: Táo Envy Mỹ Size 70-80
 Cart IDs: 28
+Item: Táo Envy Mỹ Size 70-80, Price: 195000.00, Qty: 1, Subtotal: 195000, Running Total: 195000
+Created OrderItem ID: 13 for Order ID: 11, Product: Táo Envy Mỹ Size 70-80
+Cart IDs: 29
+Item: Táo Envy Mỹ Size 70-80, Price: 195000.00, Qty: 1, Subtotal: 195000, Running Total: 195000
+Created OrderItem ID: 14 for Order ID: 12, Product: Táo Envy Mỹ Size 70-80
+Cart IDs: 30
+Item: Táo Envy Mỹ Size 70-80, Price: 195000.00, Qty: 2, Subtotal: 390000, Running Total: 390000
+Created OrderItem ID: 15 for Order ID: 13, Product: Táo Envy Mỹ Size 70-80
+Cart IDs: 31
+Item: Xoài Cát Hòa Lộc (Loại 1), Price: 145000.00, Qty: 2, Subtotal: 290000, Running Total: 290000
+Created OrderItem ID: 16 for Order ID: 14, Product: Xoài Cát Hòa Lộc (Loại 1)
+Cart IDs: 32
+Item: Táo Envy Mỹ Size 70-80, Price: 195000.00, Qty: 1, Subtotal: 195000, Running Total: 195000
+Created OrderItem ID: 17 for Order ID: 15, Product: Táo Envy Mỹ Size 70-80
+Cart IDs: 33
 Item: Nho Mẫu Đơn Nhật Bản, Price: 850000.00, Qty: 1, Subtotal: 850000, Running Total: 850000
-Created OrderItem ID: 13 for Order ID: 11, Product: Nho Mẫu Đơn Nhật Bản
+Created OrderItem ID: 18 for Order ID: 16, Product: Nho Mẫu Đơn Nhật Bản
+Cart IDs: 34,35
+Item: Nho Mẫu Đơn Nhật Bản, Price: 850000.00, Qty: 2, Subtotal: 1700000, Running Total: 1700000
+Item: Xoài Cát Hòa Lộc (Loại 1), Price: 145000.00, Qty: 1, Subtotal: 145000, Running Total: 1845000
+Created OrderItem ID: 19 for Order ID: 17, Product: Nho Mẫu Đơn Nhật Bản
+Created OrderItem ID: 20 for Order ID: 17, Product: Xoài Cát Hòa Lộc (Loại 1)
+Cart IDs: 36
+Item: Xoài Cát Hòa Lộc (Loại 1), Price: 145000.00, Qty: 1, Subtotal: 145000, Running Total: 145000
+Created OrderItem ID: 21 for Order ID: 18, Product: Xoài Cát Hòa Lộc (Loại 1)
+Cart IDs: 37
+Item: Táo Envy Mỹ Size 70-80, Price: 195000.00, Qty: 1, Subtotal: 195000, Running Total: 195000
+Created OrderItem ID: 22 for Order ID: 19, Product: Táo Envy Mỹ Size 70-80
+Cart IDs: 51,52,53
+Item: Nho Mẫu Đơn Nhật Bản, Price: 850000.00, Qty: 1, Subtotal: 850000, Running Total: 850000
+Item: Xoài Cát Hòa Lộc (Loại 1), Price: 145000.00, Qty: 1, Subtotal: 145000, Running Total: 995000
+Item: Bưởi Da Xanh Bến Tre, Price: 65000.00, Qty: 1, Subtotal: 65000, Running Total: 1060000
+Created OrderItem ID: 23 for Order ID: 20, Product: Nho Mẫu Đơn Nhật Bản
+Created OrderItem ID: 24 for Order ID: 20, Product: Xoài Cát Hòa Lộc (Loại 1)
+Created OrderItem ID: 25 for Order ID: 20, Product: Bưởi Da Xanh Bến Tre
