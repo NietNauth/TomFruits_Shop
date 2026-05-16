@@ -1,8 +1,19 @@
 import { useState, useEffect } from 'react';
 import addressService from '../../../apis/addressService';
 import axios from 'axios';
-import { toast } from 'react-toastify';
-import { Plus, MapPin, Phone, User, Trash2, CheckCircle2 } from 'lucide-react';
+import Swal from 'sweetalert2';
+
+import {
+  X,
+  Plus,
+  MapPin,
+  Phone,
+  User,
+  Pencil,
+  Trash2,
+  CheckCircle2,
+} from 'lucide-react';
+import styles from './styles.module.scss';
 
 const PROVINCE_API = 'https://provinces.open-api.vn/api';
 
@@ -10,10 +21,20 @@ function AddressBook() {
   const [addresses, setAddresses] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
 
+  const [errors, setErrors] = useState({
+    receiver_phone: '',
+  });
+  const validatePhone = (phone) => {
+    // SDT Việt Nam: 10 số, bắt đầu bằng 0
+    const regex = /^(0[3|5|7|8|9])+([0-9]{8})$/;
+
+    return regex.test(phone);
+  };
   const [formData, setFormData] = useState({
     receiver_name: '',
     receiver_phone: '',
@@ -24,9 +45,28 @@ function AddressBook() {
     ward: '',
     wardCode: '',
     address_detail: '',
-    is_default: false
+    is_default: false,
   });
+  const [popup, setPopup] = useState({
+    show: false,
+    type: '',
+    text: '',
+  });
+  const showPopup = (type, text) => {
+    setPopup({
+      show: true,
+      type,
+      text,
+    });
 
+    setTimeout(() => {
+      setPopup({
+        show: false,
+        type: '',
+        text: '',
+      });
+    }, 2000);
+  };
   useEffect(() => {
     fetchAddresses();
     fetchProvinces();
@@ -35,9 +75,12 @@ function AddressBook() {
   const fetchAddresses = async () => {
     try {
       const res = await addressService.getAddresses();
-      if (res.success) setAddresses(res.data);
-    } catch (err) {
-      toast.error('Lỗi tải danh sách địa chỉ');
+
+      if (res.success) {
+        setAddresses(res.data);
+      }
+    } catch (error) {
+      showPopup('error', 'Lỗi tải danh sách địa chỉ');
     }
   };
 
@@ -45,206 +88,483 @@ function AddressBook() {
     try {
       const res = await axios.get(`${PROVINCE_API}/p/`);
       setProvinces(res.data);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.log(error);
     }
   };
 
   useEffect(() => {
-    if (formData.provinceCode) {
-      axios.get(`${PROVINCE_API}/p/${formData.provinceCode}?depth=2`).then(res => {
-        setDistricts(res.data.districts);
-      });
-    } else {
-      setDistricts([]);
-    }
+    const fetchDistricts = async () => {
+      if (!formData.provinceCode) {
+        setDistricts([]);
+        return;
+      }
+
+      try {
+        const res = await axios.get(
+          `${PROVINCE_API}/p/${formData.provinceCode}?depth=2`
+        );
+
+        setDistricts(res.data.districts || []);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchDistricts();
     setWards([]);
   }, [formData.provinceCode]);
 
   useEffect(() => {
-    if (formData.districtCode) {
-      axios.get(`${PROVINCE_API}/d/${formData.districtCode}?depth=2`).then(res => {
-        setWards(res.data.wards);
-      });
-    } else {
-      setWards([]);
-    }
+    const fetchWards = async () => {
+      if (!formData.districtCode) {
+        setWards([]);
+        return;
+      }
+
+      try {
+        const res = await axios.get(
+          `${PROVINCE_API}/d/${formData.districtCode}?depth=2`
+        );
+
+        setWards(res.data.wards || []);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchWards();
   }, [formData.districtCode]);
 
   const handleChange = (field, value) => {
     if (field === 'province') {
-      const selected = provinces.find(p => p.name === value);
-      setFormData(prev => ({ 
-        ...prev, 
-        province: value, 
+      const selected = provinces.find((province) => province.name === value);
+
+      setFormData((prev) => ({
+        ...prev,
+        province: value,
         provinceCode: selected?.code || '',
-        district: '', districtCode: '', ward: '', wardCode: '' 
+        district: '',
+        districtCode: '',
+        ward: '',
+        wardCode: '',
       }));
-    } else if (field === 'district') {
-      const selected = districts.find(d => d.name === value);
-      setFormData(prev => ({ 
-        ...prev, 
-        district: value, 
+
+      return;
+    }
+
+    if (field === 'district') {
+      const selected = districts.find((district) => district.name === value);
+
+      setFormData((prev) => ({
+        ...prev,
+        district: value,
         districtCode: selected?.code || '',
-        ward: '', wardCode: '' 
+        ward: '',
+        wardCode: '',
       }));
-    } else if (field === 'ward') {
-      const selected = wards.find(w => w.name === value);
-      setFormData(prev => ({ 
-        ...prev, 
-        ward: value, 
+
+      return;
+    }
+
+    if (field === 'ward') {
+      const selected = wards.find((ward) => ward.name === value);
+
+      setFormData((prev) => ({
+        ...prev,
+        ward: value,
         wardCode: selected?.code || '',
       }));
-    } else {
-      setFormData(prev => ({ ...prev, [field]: value }));
+
+      return;
     }
+
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
+  const resetForm = () => {
+    setFormData({
+      receiver_name: '',
+      receiver_phone: '',
+      province: '',
+      provinceCode: '',
+      district: '',
+      districtCode: '',
+      ward: '',
+      wardCode: '',
+      address_detail: '',
+      is_default: false,
+    });
+  };
+  const handleEdit = async (addr) => {
+    try {
+      const province = provinces.find((p) => p.name === addr.province);
+
+      let districtList = [];
+      let wardList = [];
+
+      // load districts
+      if (province) {
+        const districtRes = await axios.get(
+          `${PROVINCE_API}/p/${province.code}?depth=2`
+        );
+
+        districtList = districtRes.data.districts || [];
+        setDistricts(districtList);
+      }
+
+      // tìm district code
+      const district = districtList.find((d) => d.name === addr.district);
+
+      // load wards
+      if (district) {
+        const wardRes = await axios.get(
+          `${PROVINCE_API}/d/${district.code}?depth=2`
+        );
+
+        wardList = wardRes.data.wards || [];
+        setWards(wardList);
+      }
+
+      // tìm ward code
+      const ward = wardList.find((w) => w.name === addr.ward);
+
+      setEditingId(addr.id);
+
+      setFormData({
+        receiver_name: addr.receiver_name,
+        receiver_phone: addr.receiver_phone,
+
+        province: addr.province,
+        provinceCode: province?.code || '',
+
+        district: addr.district,
+        districtCode: district?.code || '',
+
+        ward: addr.ward,
+        wardCode: ward?.code || '',
+
+        address_detail: addr.address_detail,
+        is_default: addr.is_default,
+      });
+
+      setShowForm(true);
+    } catch (error) {
+      showPopup('error', 'Không thể tải dữ liệu địa chỉ');
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors({
+      receiver_phone: '',
+    });
+
+    // validate SDT
+    if (!validatePhone(formData.receiver_phone)) {
+      setErrors({
+        receiver_phone: 'Số điện thoại không hợp lệ',
+      });
+
+      return;
+    }
+
     setLoading(true);
+
     try {
-      const res = await addressService.createAddress(formData);
+      const res = editingId
+        ? await addressService.updateAddress(editingId, formData)
+        : await addressService.createAddress(formData);
+
       if (res.success) {
-        toast.success('Thêm địa chỉ thành công');
-        setShowForm(false);
+        showPopup(
+          'success',
+          editingId ? 'Cập nhật địa chỉ thành công' : 'Thêm địa chỉ thành công'
+        );
+
         fetchAddresses();
-        setFormData({
-          receiver_name: '', receiver_phone: '',
-          province: '', provinceCode: '', district: '', districtCode: '',
-          ward: '', wardCode: '', address_detail: '', is_default: false
-        });
+        setShowForm(false);
+        resetForm();
+        setEditingId(null);
       }
-    } catch (err) {
-      toast.error(err.message || 'Lỗi khi lưu địa chỉ');
+    } catch (error) {
+      showPopup('error', error.message || 'Lỗi khi lưu địa chỉ');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc muốn xóa địa chỉ này?')) return;
+    const result = await Swal.fire({
+      title: 'Xóa địa chỉ?',
+      text: 'Bạn có chắc muốn xóa địa chỉ này không?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Xóa',
+      cancelButtonText: 'Hủy',
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#16a34a',
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       const res = await addressService.deleteAddress(id);
+
       if (res.success) {
-        toast.success('Đã xóa địa chỉ');
+        showPopup('success', 'Đã xóa địa chỉ');
         fetchAddresses();
       }
-    } catch (err) {
-      toast.error(err.message || 'Lỗi khi xóa địa chỉ');
+    } catch (error) {
+      showPopup('error', error.message || 'Lỗi khi xóa địa chỉ');
     }
   };
 
   const handleSetDefault = async (id) => {
     try {
       const res = await addressService.setDefault(id);
+
       if (res.success) {
-        toast.success('Đã đặt làm mặc định');
+        showPopup('success', 'Đã đặt làm mặc định');
         fetchAddresses();
       }
-    } catch (err) {
-      toast.error(err.message || 'Lỗi hệ thống');
+    } catch (error) {
+      showPopup('error', error.message || 'Lỗi hệ thống');
     }
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h3 style={{ fontSize: '20px', fontWeight: '600' }}>Sổ địa chỉ</h3>
-        <button 
-          onClick={() => setShowForm(!showForm)}
-          style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: '#16a34a', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer' }}
+    <div className={styles.addressBook}>
+      <div className={styles.header}>
+        <h3>Sổ địa chỉ</h3>
+
+        <button
+          type='button'
+          className={styles.addBtn}
+          onClick={() => {
+            setShowForm(!showForm);
+
+            if (showForm) {
+              resetForm();
+              setEditingId(null);
+            }
+          }}
         >
-          <Plus size={18} /> {showForm ? 'Hủy' : 'Thêm địa chỉ mới'}
+          {showForm ? <X size={18} /> : <Plus size={18} />}
+
+          {showForm ? 'Hủy' : 'Thêm địa chỉ mới'}
         </button>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} style={{ backgroundColor: '#f9fafb', padding: '20px', borderRadius: '8px', marginBottom: '30px', border: '1px solid #e5e7eb' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <label style={{ fontSize: '14px', fontWeight: '500' }}>Tên người nhận</label>
-              <input required value={formData.receiver_name} onChange={e => handleChange('receiver_name', e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5db', borderRadius: '4px' }} />
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <div className={styles.formGrid}>
+            <div className={styles.formGroup}>
+              <label>Tên người nhận</label>
+
+              <input
+                type='text'
+                required
+                value={formData.receiver_name}
+                onChange={(e) => handleChange('receiver_name', e.target.value)}
+              />
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <label style={{ fontSize: '14px', fontWeight: '500' }}>Số điện thoại</label>
-              <input required value={formData.receiver_phone} onChange={e => handleChange('receiver_phone', e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5db', borderRadius: '4px' }} />
+
+            <div className={styles.formGroup}>
+              <label>Số điện thoại</label>
+
+              <input
+                type='text'
+                required
+                value={formData.receiver_phone}
+                onChange={(e) => {
+                  handleChange('receiver_phone', e.target.value);
+                  // xoá lỗi khi nhập lại
+                  if (errors.receiver_phone) {
+                    setErrors((prev) => ({
+                      ...prev,
+                      receiver_phone: '',
+                    }));
+                  }
+                }}
+              />
+              {errors.receiver_phone && (
+                <span className={styles.errorText}>
+                  {errors.receiver_phone}
+                </span>
+              )}
             </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <label style={{ fontSize: '14px', fontWeight: '500' }}>Tỉnh/Thành</label>
-              <select required value={formData.province} onChange={e => handleChange('province', e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5db', borderRadius: '4px' }}>
-                <option value="">Chọn tỉnh thành</option>
-                {provinces.map(p => <option key={p.code} value={p.name}>{p.name}</option>)}
+
+            <div className={styles.formGroup}>
+              <label>Tỉnh / Thành phố</label>
+
+              <select
+                required
+                value={formData.province}
+                onChange={(e) => handleChange('province', e.target.value)}
+              >
+                <option value=''>Chọn tỉnh thành</option>
+
+                {provinces.map((province) => (
+                  <option key={province.code} value={province.name}>
+                    {province.name}
+                  </option>
+                ))}
               </select>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <label style={{ fontSize: '14px', fontWeight: '500' }}>Quận/Huyện</label>
-              <select required value={formData.district} onChange={e => handleChange('district', e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5db', borderRadius: '4px' }}>
-                <option value="">Chọn quận huyện</option>
-                {districts.map(d => <option key={d.code} value={d.name}>{d.name}</option>)}
+
+            <div className={styles.formGroup}>
+              <label>Quận / Huyện</label>
+
+              <select
+                required
+                value={formData.district}
+                onChange={(e) => handleChange('district', e.target.value)}
+              >
+                <option value=''>Chọn quận huyện</option>
+
+                {districts.map((district) => (
+                  <option key={district.code} value={district.name}>
+                    {district.name}
+                  </option>
+                ))}
               </select>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <label style={{ fontSize: '14px', fontWeight: '500' }}>Phường/Xã</label>
-              <select required value={formData.ward} onChange={e => handleChange('ward', e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5db', borderRadius: '4px' }}>
-                <option value="">Chọn phường xã</option>
-                {wards.map(w => <option key={w.code} value={w.name}>{w.name}</option>)}
+
+            <div className={styles.formGroup}>
+              <label>Phường / Xã</label>
+
+              <select
+                required
+                value={formData.ward}
+                onChange={(e) => handleChange('ward', e.target.value)}
+              >
+                <option value=''>Chọn phường xã</option>
+
+                {wards.map((ward) => (
+                  <option key={ward.code} value={ward.name}>
+                    {ward.name}
+                  </option>
+                ))}
               </select>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-              <label style={{ fontSize: '14px', fontWeight: '500' }}>Địa chỉ chi tiết</label>
-              <input required value={formData.address_detail} onChange={e => handleChange('address_detail', e.target.value)} style={{ padding: '8px', border: '1px solid #d1d5db', borderRadius: '4px' }} />
+
+            <div className={styles.formGroup}>
+              <label>Địa chỉ chi tiết</label>
+
+              <input
+                type='text'
+                required
+                value={formData.address_detail}
+                onChange={(e) => handleChange('address_detail', e.target.value)}
+              />
             </div>
           </div>
-          <div style={{ marginTop: '15px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
-              <input type="checkbox" checked={formData.is_default} onChange={e => handleChange('is_default', e.target.checked)} />
+
+          <div className={styles.checkbox}>
+            <label>
+              <input
+                type='checkbox'
+                checked={formData.is_default}
+                onChange={(e) => handleChange('is_default', e.target.checked)}
+              />
               Đặt làm địa chỉ mặc định
             </label>
           </div>
-          <button type="submit" disabled={loading} style={{ marginTop: '20px', width: '100%', padding: '10px', backgroundColor: '#16a34a', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600' }}>
+
+          <button type='submit' disabled={loading} className={styles.submitBtn}>
             {loading ? 'Đang lưu...' : 'Lưu địa chỉ'}
           </button>
         </form>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+      <div className={styles.list}>
         {addresses.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#6b7280' }}>Bạn chưa có địa chỉ nào lưu lại.</div>
+          <div className={styles.empty}>Bạn chưa có địa chỉ nào lưu lại.</div>
         ) : (
-          addresses.map(addr => (
-            <div key={addr.id} style={{ padding: '15px', border: '1px solid #e5e7eb', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', backgroundColor: addr.is_default ? '#f0fdf4' : 'transparent' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px' }}><User size={16}/> {addr.receiver_name}</span>
-                  {addr.is_default && <span style={{ fontSize: '12px', color: '#16a34a', backgroundColor: '#dcfce7', padding: '2px 8px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle2 size={12}/> Mặc định</span>}
+          addresses.map((addr) => (
+            <div
+              key={addr.id}
+              className={`${styles.card} ${
+                addr.is_default ? styles.defaultCard : ''
+              }`}
+            >
+              <div className={styles.info}>
+                <div className={styles.top}>
+                  <span className={styles.name}>
+                    <User size={16} />
+
+                    {addr.receiver_name}
+                  </span>
+
+                  {addr.is_default && (
+                    <span className={styles.badge}>
+                      <CheckCircle2 size={12} />
+                      Mặc định
+                    </span>
+                  )}
                 </div>
-                <span style={{ fontSize: '14px', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '5px' }}><Phone size={16}/> {addr.receiver_phone}</span>
-                <span style={{ fontSize: '14px', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '5px' }}><MapPin size={16}/> {addr.address_detail}, {addr.ward}, {addr.district}, {addr.province}</span>
+
+                <span className={styles.text}>
+                  <Phone size={16} />
+
+                  {addr.receiver_phone}
+                </span>
+
+                <span className={styles.text}>
+                  <MapPin size={16} />
+                  {addr.address_detail}, {addr.ward}, {addr.district},{' '}
+                  {addr.province}
+                </span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                {!addr.is_default && (
-                  <button 
+
+              {!addr.is_default && (
+                <div className={styles.actions}>
+                  <button
+                    type='button'
+                    className={styles.defaultBtn}
                     onClick={() => handleSetDefault(addr.id)}
-                    style={{ fontSize: '13px', color: '#2563eb', border: 'none', background: 'none', cursor: 'pointer', textDecoration: 'underline' }}
                   >
                     Thiết lập mặc định
                   </button>
-                )}
-                {!addr.is_default && (
-                  <button 
-                    onClick={() => handleDelete(addr.id)}
-                    style={{ color: '#dc2626', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                )}
-              </div>
+                  <div className={styles.actionButtons}>
+                    <button
+                      type='button'
+                      className={styles.editBtn}
+                      onClick={() => handleEdit(addr)}
+                    >
+                      <Pencil size={18} />
+                    </button>
+                    <button
+                      type='button'
+                      className={styles.deleteBtn}
+                      onClick={() => handleDelete(addr.id)}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))
         )}
       </div>
+      {popup.show && (
+        <div className={styles.popupOverlay}>
+          <div
+            className={`${styles.popup} ${
+              popup.type === 'error' ? styles.popupError : styles.popupSuccess
+            }`}
+          >
+            <CheckCircle2 size={42} />
+
+            <span>{popup.text}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

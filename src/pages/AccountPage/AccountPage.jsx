@@ -2,7 +2,7 @@ import MyHeader from '../../components/Header/Header';
 import MyFooter from '../../components/Footer/Footer';
 import styles from './styles.module.scss';
 import Infomation from './Infomation/Infomation';
-import OrderHistory from './OrderHistory/OrderHistory';
+import OrderHistory from '../OrderHistory/OrderHistory';
 import ChangePassword from './ChangePassword/ChangePassword';
 import AddressBook from './AddressBook/AddressBook';
 import { useState } from 'react';
@@ -37,12 +37,6 @@ function AccountPage() {
                   onClick={() => setActiveTab('profile')}
                 >
                   Thông tin cá nhân
-                </button>
-                <button
-                  className={activeTab === 'orders' ? styles.active : ''}
-                  onClick={() => setActiveTab('orders')}
-                >
-                  Lịch sử đơn hàng
                 </button>
                 <button
                   className={activeTab === 'password' ? styles.active : ''}

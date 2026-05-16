@@ -6,7 +6,7 @@ import { FaFacebook } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { Leaf } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { toast } from 'react-toastify';
+
 function Login() {
   const {
     container,
@@ -32,7 +32,6 @@ function Login() {
 
     const result = await login({ email, password });
     if (result.success) {
-      toast.success('Đăng nhập thành công!');
       navigate('/');
     } else {
       setLoginError(result.message || 'Email hoặc mật khẩu không đúng!');

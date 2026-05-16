@@ -21,6 +21,7 @@ function Cart() {
             price: item.product.price,
             img: item.product.image_url,
             quantity: item.quantity,
+            stock: item.product.quantity,
           }));
           setCartItems(items);
         } else {
@@ -33,13 +34,18 @@ function Cart() {
       }
     };
     fetchCart();
-    
+
     const handleCartUpdate = () => fetchCart();
     window.addEventListener('cartUpdated', handleCartUpdate);
     return () => window.removeEventListener('cartUpdated', handleCartUpdate);
   }, [isLoggedIn]);
 
-  if (isLoading) return <div style={{padding: 50, textAlign: 'center'}}>Đang tải giỏ hàng...</div>;
+  if (isLoading)
+    return (
+      <div style={{ padding: 50, textAlign: 'center' }}>
+        Đang tải giỏ hàng...
+      </div>
+    );
 
   return (
     <div>

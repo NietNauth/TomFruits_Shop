@@ -1,40 +1,72 @@
 import { useState } from 'react';
 import styles from './styles.module.scss';
-import { CircleCheckBig } from 'lucide-react';
+import { CircleCheckBig, CircleX } from 'lucide-react';
 import authService from '../../../apis/authService';
-import { toast } from 'react-toastify';
 
 function ChangePassword() {
   const [form, setForm] = useState({ current: '', newPass: '', confirm: '' });
 
-  const [newPassError, setNewPassError] = useState('');
-  const [confirmError, setConfirmError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  // const [newPassError, setNewPassError] = useState('');
+  // const [confirmError, setConfirmError] = useState('');
+  const [errors, setErrors] = useState({
+    newPass: '',
+    confirm: '',
+  });
+  const [message, setMessage] = useState({
+    type: '',
+    text: '',
+  });
+  const showMessage = (type, text) => {
+    setMessage({ type, text });
 
+    setTimeout(() => {
+      setMessage({ type: '', text: '' });
+    }, 3000);
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
 
     if (name === 'newPass') {
-      if (value && value.length < 8)
-        setNewPassError('Mật khẩu phải ít nhất 8 ký tự');
-      else setNewPassError('');
+      if (value && value.length < 8) {
+        setErrors((prev) => ({
+          ...prev,
+          newPass: 'Mật khẩu phải ít nhất 8 ký tự',
+        }));
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          newPass: '',
+        }));
+      }
 
       // re-validate confirm nếu đã nhập
-      if (form.confirm)
-        setConfirmError(value !== form.confirm ? 'Mật khẩu không khớp' : '');
+      if (form.confirm) {
+        setErrors((prev) => ({
+          ...prev,
+          confirm: value !== form.confirm ? 'Mật khẩu không khớp' : '',
+        }));
+      }
     }
 
     if (name === 'confirm') {
       if (value && value !== form.newPass)
-        setConfirmError('Mật khẩu không khớp');
-      else setConfirmError('');
+        setErrors((prev) => ({
+          ...prev,
+          confirm: 'Mật khẩu không khớp',
+        }));
+      else {
+        setErrors((prev) => ({
+          ...prev,
+          confirm: '',
+        }));
+      }
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (newPassError || confirmError) return;
+    if (errors.newPass || errors.confirm) return;
 
     try {
       await authService.changePassword({
@@ -42,11 +74,14 @@ function ChangePassword() {
         password: form.newPass,
         password_confirmation: form.confirm,
       });
-      setSuccessMsg('Đổi mật khẩu thành công!');
-      setTimeout(() => setSuccessMsg(''), 3000);
+      showMessage('success', 'Đổi mật khẩu thành công!');
       setForm({ current: '', newPass: '', confirm: '' });
+      setErrors({
+        newPass: '',
+        confirm: '',
+      });
     } catch (err) {
-      toast.error(err.message || 'Đổi mật khẩu thất bại!');
+      showMessage('error', err.message || 'Đổi mật khẩu thất bại!');
     }
   };
 
@@ -54,9 +89,16 @@ function ChangePassword() {
     <div className={styles.container}>
       <div className={styles.boxHeader}>
         <h3>🔒 Đổi mật khẩu</h3>
-        {successMsg && (
-          <span className={styles.successBadge}>
-            <CircleCheckBig size={14} /> {successMsg}
+        {message.text && (
+          <span
+            className={`${styles.messageBadge} ${message.type === 'success' ? styles.successBadge : styles.errorBadge}`}
+          >
+            {message.type === 'error' ? (
+              <CircleX size={14} />
+            ) : (
+              <CircleCheckBig size={14} />
+            )}
+            {message.text}
           </span>
         )}
       </div>
@@ -89,13 +131,15 @@ function ChangePassword() {
             value={form.newPass}
             onChange={handleChange}
             placeholder='Nhập mật khẩu mới'
-            className={newPassError ? styles.inputError : ''}
+            className={errors.newPass ? styles.inputError : ''}
             onInvalid={(e) =>
               e.target.setCustomValidity('Vui lòng nhập mật khẩu mới!')
             }
             onInput={(e) => e.target.setCustomValidity('')}
           />
-          {newPassError && <p className={styles.errorMsg}>{newPassError}</p>}
+          {errors.newPass && (
+            <p className={styles.errorMsg}>{errors.newPass}</p>
+          )}
         </div>
 
         {/* Xác nhận mật khẩu */}
@@ -108,13 +152,15 @@ function ChangePassword() {
             value={form.confirm}
             onChange={handleChange}
             placeholder='Nhập lại mật khẩu'
-            className={confirmError ? styles.inputError : ''}
+            className={errors.confirm ? styles.inputError : ''}
             onInvalid={(e) =>
               e.target.setCustomValidity('Vui lòng xác nhận mật khẩu!')
             }
             onInput={(e) => e.target.setCustomValidity('')}
           />
-          {confirmError && <p className={styles.errorMsg}>{confirmError}</p>}
+          {errors.confirm && (
+            <p className={styles.errorMsg}>{errors.confirm}</p>
+          )}
         </div>
 
         <button type='submit' className={styles.submit}>

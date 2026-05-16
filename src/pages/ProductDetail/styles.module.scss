@@ -150,6 +150,17 @@
         padding: 0 10px;
       }
     }
+    .qtyRow {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .stockText {
+      font-size: 16px;
+      color: #9ca3af;
+      white-space: nowrap;
+    }
     .totalBar {
       margin-top: 20px;
       padding: 12px 16px;
@@ -186,6 +197,20 @@
       padding: 10px 20px;
       border-radius: 999px;
       cursor: pointer;
+      gap: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 16px;
+      svg {
+        flex-shrink: 0;
+        font-size: 16px;
+      }
+
+      span {
+        display: inline-block;
+      }
     }
 
     .btnOutline {
@@ -196,6 +221,7 @@
       padding: 10px 20px;
       border-radius: 999px;
       cursor: pointer;
+      font-size: 16px;
     }
     .features {
       display: flex;
@@ -238,6 +264,7 @@
         padding: 10px;
         cursor: pointer;
         color: #666;
+        font-size: 17px;
       }
     }
 
@@ -256,7 +283,8 @@
     }
   }
   .richText {
-    ul, ol {
+    ul,
+    ol {
       padding-left: 20px;
       margin: 10px 0;
     }
@@ -266,7 +294,9 @@
     strong {
       font-weight: 700;
     }
-    h1, h2, h3 {
+    h1,
+    h2,
+    h3 {
       margin: 10px 0;
       color: #1a1a1a;
     }

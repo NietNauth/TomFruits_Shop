@@ -20,7 +20,11 @@ function CartContent({ cartItems, setCartItems }) {
 
   const formatPrice = (value) => {
     if (value === undefined || value === null) return '0đ';
-    return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + 'đ';
+    return (
+      Math.round(value)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',') + 'đ'
+    );
   };
 
   const increaseQty = async (item) => {
@@ -82,6 +86,16 @@ function CartContent({ cartItems, setCartItems }) {
       setCouponMessage({ text: '✗ Mã không hợp lệ!', type: 'error' });
     }
   };
+  const [inputValues, setInputValues] = useState({});
+  useEffect(() => {
+    const values = {};
+
+    cartItems.forEach((item) => {
+      values[item.id] = item.quantity;
+    });
+
+    setInputValues(values);
+  }, [cartItems]);
   return (
     <>
       <MyHeader />
@@ -108,7 +122,13 @@ function CartContent({ cartItems, setCartItems }) {
                 <div key={item.id} className={styles.item}>
                   {/* PRODUCT */}
                   <div className={styles.product}>
-                    <img src={item.img || 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%20viewBox%3D%220%200%20150%20150%22%3E%3Crect%20width%3D%22150%22%20height%3D%22150%22%20fill%3D%22%23f3f4f6%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%239ca3af%22%20font-family%3D%22sans-serif%22%20font-size%3D%2214%22%3ENo%20Img%3C%2Ftext%3E%3C%2Fsvg%3E'} alt={item.name} />
+                    <img
+                      src={
+                        item.img ||
+                        'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%20viewBox%3D%220%200%20150%20150%22%3E%3Crect%20width%3D%22150%22%20height%3D%22150%22%20fill%3D%22%23f3f4f6%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%239ca3af%22%20font-family%3D%22sans-serif%22%20font-size%3D%2214%22%3ENo%20Img%3C%2Ftext%3E%3C%2Fsvg%3E'
+                      }
+                      alt={item.name}
+                    />
                     <div className={styles.info}>
                       <div className={styles.name}>{item.name}</div>
                       <div className={styles.category}>{item.category}</div>
@@ -117,16 +137,92 @@ function CartContent({ cartItems, setCartItems }) {
                   </div>
 
                   {/* PRICE */}
-                  <div className={styles.price}>
-                    {formatPrice(item.price)}
-                  </div>
+                  <div className={styles.price}>{formatPrice(item.price)}</div>
 
                   {/* QUANTITY + DELETE */}
-                    <div className={styles.quantityWrap}>
+                  <div className={styles.quantityWrap}>
                     <div className={styles.quantity}>
                       <button onClick={() => decreaseQty(item)}>−</button>
-                      <span>{item.quantity}</span>
-                      <button onClick={() => increaseQty(item)}>+</button>
+                      <input
+                        type='number'
+                        min='1'
+                        value={inputValues[item.id] ?? item.quantity}
+                        onChange={(e) => {
+                          setInputValues({
+                            ...inputValues,
+                            [item.id]: e.target.value,
+                          });
+                        }}
+                        onBlur={async () => {
+                          const value = Number(inputValues[item.id]);
+
+                          if (!value || value < 1) {
+                            await updateCartQuantity(
+                              item.id,
+                              1,
+                              item.cartItemId
+                            );
+                            return;
+                          }
+
+                          if (value > item.stock) {
+                            Swal.fire({
+                              icon: 'warning',
+                              title: 'Vượt quá tồn kho',
+                              text: `Chỉ còn ${item.stock} sản phẩm trong kho`,
+                              confirmButtonText: 'OK',
+                              customClass: {
+                                popup: styles.swalPopup,
+                                title: styles.swalTitle,
+                                htmlContainer: styles.swalText,
+                                confirmButton: styles.swalBtn,
+                              },
+                              buttonsStyling: false,
+                            });
+
+                            await updateCartQuantity(
+                              item.id,
+                              item.stock,
+                              item.cartItemId
+                            );
+
+                            return;
+                          }
+
+                          await updateCartQuantity(
+                            item.id,
+                            value,
+                            item.cartItemId
+                          );
+                        }}
+                      />
+                      <button
+                        onClick={async () => {
+                          if (item.quantity >= item.stock) {
+                            Swal.fire({
+                              icon: 'warning',
+                              title: 'Vượt quá tồn kho',
+                              text: `Chỉ còn ${item.stock} sản phẩm trong kho`,
+                              confirmButtonText: 'OK',
+                              customClass: {
+                                popup: styles.swalPopup,
+                                title: styles.swalTitle,
+                                htmlContainer: styles.swalText,
+                                confirmButton: styles.swalBtn,
+                              },
+                              buttonsStyling: false,
+                            });
+
+                            return;
+                          }
+
+                          await increaseQty(item);
+                        }}
+                      >
+                        +
+                      </button>
+                      {/* <span>{item.quantity}</span>
+                      <button onClick={() => increaseQty(item)}>+</button> */}
                     </div>
                     <button
                       className={styles.deleteBtn}
@@ -194,16 +290,13 @@ function CartContent({ cartItems, setCartItems }) {
                 <div className={styles.row}>
                   <span>Phí vận chuyển</span>
                   <span>
-                    {shippingFee === 0
-                      ? 'Miễn phí'
-                      : formatPrice(shippingFee)}
+                    {shippingFee === 0 ? 'Miễn phí' : formatPrice(shippingFee)}
                   </span>
                 </div>
 
                 {remaining > 0 && (
                   <div className={styles.freeShipHint}>
-                    Mua thêm {formatPrice(remaining)} để được miễn
-                    phí ship
+                    Mua thêm {formatPrice(remaining)} để được miễn phí ship
                   </div>
                 )}
 
