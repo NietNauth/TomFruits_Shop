@@ -37,6 +37,13 @@ class OrderController extends Controller
         ]);
     }
 
+    protected $orderService;
+
+    public function __construct(\App\Services\OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
     public function updateStatus(UpdateOrderStatusRequest $request, $id)
     {
         $order = Order::findOrFail($id);
@@ -48,8 +55,12 @@ class OrderController extends Controller
             ], 422);
         }
 
-        $order->status = $request->status;
-        $order->save();
+        if ($request->status === 'cancelled' && $order->status !== 'cancelled') {
+            $this->orderService->cancelOrder($order);
+        } else {
+            $order->status = $request->status;
+            $order->save();
+        }
 
         return response()->json([
             'success' => true,

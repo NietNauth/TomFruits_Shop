@@ -35,6 +35,9 @@ class OrderService
                 if (!$item->product) {
                     throw new Exception("Sản phẩm không còn tồn tại.");
                 }
+                if ($item->product->quantity < $item->quantity) {
+                    throw new Exception("Sản phẩm {$item->product->name} không đủ tồn kho (Chỉ còn: {$item->product->quantity}). Vui lòng cập nhật lại giỏ hàng.");
+                }
                 $itemPrice = $item->product->price;
                 $itemQty = $item->quantity;
                 $subtotal = $itemPrice * $itemQty;

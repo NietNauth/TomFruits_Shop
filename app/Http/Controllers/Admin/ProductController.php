@@ -58,6 +58,13 @@ class ProductController extends Controller
             $data['img'] = $path;
         }
 
+        // Auto status based on quantity if not provided
+        if (!isset($data['status'])) {
+            $data['status'] = ($data['quantity'] ?? 0) > 0 ? 'in_stock' : 'out_of_stock';
+        } elseif ($data['status'] === 'in_stock' && ($data['quantity'] ?? 0) <= 0) {
+            $data['status'] = 'out_of_stock';
+        }
+
         $product = Product::create($data);
 
         return response()->json([
@@ -79,6 +86,15 @@ class ProductController extends Controller
             }
             $path = $request->file('img')->store('products', 'public');
             $data['img'] = $path;
+        }
+
+        // Auto status based on quantity
+        if (isset($data['quantity'])) {
+            if ($data['quantity'] <= 0) {
+                $data['status'] = 'out_of_stock';
+            } elseif (($data['status'] ?? $product->status) === 'out_of_stock' && $data['quantity'] > 0) {
+                $data['status'] = 'in_stock';
+            }
         }
 
         $product->update($data);

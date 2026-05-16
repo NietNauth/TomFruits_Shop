@@ -26,12 +26,34 @@ class CartController extends Controller
         $productId = $request->product_id;
         $quantity = $request->quantity;
 
+        $product = \App\Models\Product::findOrFail($productId);
+        
+        if ($product->quantity <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sản phẩm này đã hết hàng'
+            ], 400);
+        }
+
         $cart = Cart::where('user_id', $userId)->where('product_id', $productId)->first();
 
         if ($cart) {
-            $cart->quantity += $quantity;
+            $newQuantity = $cart->quantity + $quantity;
+            if ($newQuantity > $product->quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Số lượng trong giỏ hàng vượt quá tồn kho hiện tại (Tối đa: ' . $product->quantity . ')'
+                ], 400);
+            }
+            $cart->quantity = $newQuantity;
             $cart->save();
         } else {
+            if ($quantity > $product->quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Số lượng yêu cầu vượt quá tồn kho hiện tại (Tối đa: ' . $product->quantity . ')'
+                ], 400);
+            }
             $cart = Cart::create([
                 'user_id' => $userId,
                 'product_id' => $productId,
@@ -53,7 +75,14 @@ class CartController extends Controller
         ]);
 
         $userId = auth('api')->id();
-        $cart = Cart::where('user_id', $userId)->findOrFail($id);
+        $cart = Cart::with('product')->where('user_id', $userId)->findOrFail($id);
+        
+        if ($request->quantity > $cart->product->quantity) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Số lượng vượt quá tồn kho hiện tại (Tối đa: ' . $cart->product->quantity . ')'
+            ], 400);
+        }
 
         $cart->quantity = $request->quantity;
         $cart->save();
