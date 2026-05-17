@@ -14,6 +14,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import addressService from '../../apis/addressService';
+import Swal from 'sweetalert2';
 
 const PROVINCE_API = 'https://provinces.open-api.vn/api';
 
@@ -163,72 +164,93 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
   const phoneRegex = /^(0[35789])[0-9]{8}$/;
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // if (
-    //   !formData.receiver_name ||
-    //   !formData.receiver_phone ||
-    //   !formData.province ||
-    //   !formData.district ||
-    //   !formData.ward ||
-    //   !formData.address_detail
-    // ) {
-    //   showMessage('warn', 'Vui lòng nhập đầy đủ thông tin');
-    //   return;
-    // }
-    // if (!phoneRegex.test(formData.receiver_phone)) {
-    //   showMessage('warn', 'Số điện thoại không hợp lệ');
-    //   return;
-    // }
+    if (
+      !formData.receiver_name ||
+      !formData.receiver_phone ||
+      !formData.province ||
+      !formData.district ||
+      !formData.ward ||
+      !formData.address_detail
+    ) {
+      Swal.fire({
+        title: 'Cảnh báo!',
+        text: 'Vui lòng nhập đầy đủ thông tin địa chỉ',
+        icon: 'warning',
+        confirmButtonColor: '#f59e0b',
+        confirmButtonText: 'Đồng ý',
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
       if (editId) {
         await addressService.updateAddress(editId, formData);
-        // showMessage('success', 'Cập nhật địa chỉ thành công!');
+        Swal.fire({
+          title: 'Thành công!',
+          text: 'Cập nhật địa chỉ thành công!',
+          icon: 'success',
+          confirmButtonColor: '#10b981',
+          confirmButtonText: 'Đồng ý',
+        });
       } else {
         await addressService.createAddress(formData);
-        showMessage('success', 'Thêm địa chỉ mới thành công!');
+        Swal.fire({
+          title: 'Thành công!',
+          text: 'Thêm địa chỉ mới thành công!',
+          icon: 'success',
+          confirmButtonColor: '#10b981',
+          confirmButtonText: 'Đồng ý',
+        });
       }
       onRefresh();
       setView('list');
     } catch (err) {
-      showMessage('error', err.message || 'Có lỗi xảy ra');
+      Swal.fire({
+        title: 'Thất bại!',
+        text: err.message || 'Có lỗi xảy ra trong quá trình lưu địa chỉ.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Đồng ý',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id) => {
-    const result = await Swal.fire({
+    Swal.fire({
       title: 'Xóa địa chỉ?',
-      text: 'Bạn có chắc chắn muốn xóa địa chỉ này?',
+      text: 'Bạn có chắc chắn muốn xóa địa chỉ này? Thao tác này không thể hoàn tác.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#22c55e',
-      cancelButtonColor: '#ef4444',
-      confirmButtonText: 'Xóa',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Xóa ngay',
       cancelButtonText: 'Hủy',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await addressService.deleteAddress(id);
+          Swal.fire({
+            title: 'Đã xóa!',
+            text: 'Địa chỉ đã được xóa thành công.',
+            icon: 'success',
+            confirmButtonColor: '#10b981',
+            confirmButtonText: 'Đồng ý',
+          });
+          onRefresh();
+        } catch (err) {
+          Swal.fire({
+            title: 'Thất bại!',
+            text: err.message || 'Không thể xóa địa chỉ này.',
+            icon: 'error',
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'Đồng ý',
+          });
+        }
+      }
     });
-
-    if (!result.isConfirmed) return;
-
-    try {
-      await addressService.deleteAddress(id);
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Đã xóa địa chỉ',
-        showConfirmButton: false,
-        timer: 1500,
-      });
-
-      onRefresh();
-    } catch (err) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Không thể xóa địa chỉ',
-        text: err.message,
-      });
-    }
   };
 
   if (!isOpen) return null;

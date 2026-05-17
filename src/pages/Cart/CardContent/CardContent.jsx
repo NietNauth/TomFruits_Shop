@@ -1,7 +1,7 @@
 import MyFooter from '../../../components/Footer/Footer';
 import MyHeader from '../../../components/Header/Header';
 import styles from './styles.module.scss';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trash2 } from 'lucide-react';
 import Swal from 'sweetalert2';
@@ -27,15 +27,75 @@ function CartContent({ cartItems, setCartItems }) {
     );
   };
 
-  const increaseQty = async (item) => {
-    await updateCartQuantity(item.id, item.quantity + 1, item.cartItemId);
+  const pendingUpdates = useRef({});
+
+  const changeQty = (item, newQty) => {
+    // 1. Cập nhật UI cục bộ ngay lập tức để người dùng thấy số lượng và giá thay đổi không trễ
+    setCartItems((prev) =>
+      prev.map((x) => (x.id === item.id ? { ...x, quantity: newQty } : x))
+    );
+
+    // 2. Debounce cuộc gọi API đồng bộ CSDL
+    if (pendingUpdates.current[item.id]) {
+      clearTimeout(pendingUpdates.current[item.id]);
+    }
+
+    pendingUpdates.current[item.id] = setTimeout(async () => {
+      await updateCartQuantity(item.id, newQty, item.cartItemId);
+      delete pendingUpdates.current[item.id];
+    }, 450); // 450ms debounce
   };
 
-  const decreaseQty = async (item) => {
+  const increaseQty = (item) => {
+    if (item.quantity >= item.stock) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Giới hạn tồn kho',
+        text: `Số lượng sản phẩm trong giỏ đã đạt mức tối đa của kho (Tồn kho: ${item.stock})`,
+        confirmButtonText: 'Đồng ý',
+      });
+      return;
+    }
+    changeQty(item, item.quantity + 1);
+  };
+
+  const decreaseQty = (item) => {
     if (item.quantity > 1) {
-      await updateCartQuantity(item.id, item.quantity - 1, item.cartItemId);
+      changeQty(item, item.quantity - 1);
     } else {
-      await removeItem(item);
+      removeItem(item);
+    }
+  };
+
+  const handleQtyChange = (item, valStr) => {
+    if (valStr === '') {
+      setCartItems((prev) =>
+        prev.map((x) => (x.id === item.id ? { ...x, quantity: '' } : x))
+      );
+      return;
+    }
+
+    let val = parseInt(valStr, 10);
+    if (isNaN(val) || val < 1) {
+      val = 1;
+    }
+
+    if (val > item.stock) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Giới hạn tồn kho',
+        text: `Số lượng vượt quá tồn kho tối đa của sản phẩm này (Tồn kho: ${item.stock})`,
+        confirmButtonText: 'Đồng ý',
+      });
+      val = item.stock;
+    }
+
+    changeQty(item, val);
+  };
+
+  const handleQtyBlur = (item) => {
+    if (item.quantity === '' || item.quantity < 1) {
+      changeQty(item, 1);
     }
   };
 
@@ -145,84 +205,25 @@ function CartContent({ cartItems, setCartItems }) {
                       <button onClick={() => decreaseQty(item)}>−</button>
                       <input
                         type='number'
-                        min='1'
-                        value={inputValues[item.id] ?? item.quantity}
-                        onChange={(e) => {
-                          setInputValues({
-                            ...inputValues,
-                            [item.id]: e.target.value,
-                          });
-                        }}
-                        onBlur={async () => {
-                          const value = Number(inputValues[item.id]);
-
-                          if (!value || value < 1) {
-                            await updateCartQuantity(
-                              item.id,
-                              1,
-                              item.cartItemId
-                            );
-                            return;
-                          }
-
-                          if (value > item.stock) {
-                            Swal.fire({
-                              icon: 'warning',
-                              title: 'Vượt quá tồn kho',
-                              text: `Chỉ còn ${item.stock} sản phẩm trong kho`,
-                              confirmButtonText: 'OK',
-                              customClass: {
-                                popup: styles.swalPopup,
-                                title: styles.swalTitle,
-                                htmlContainer: styles.swalText,
-                                confirmButton: styles.swalBtn,
-                              },
-                              buttonsStyling: false,
-                            });
-
-                            await updateCartQuantity(
-                              item.id,
-                              item.stock,
-                              item.cartItemId
-                            );
-
-                            return;
-                          }
-
-                          await updateCartQuantity(
-                            item.id,
-                            value,
-                            item.cartItemId
-                          );
-                        }}
+                        value={item.quantity}
+                        onChange={(e) => handleQtyChange(item, e.target.value)}
+                        onBlur={() => handleQtyBlur(item)}
+                        min={1}
+                        max={item.stock}
                       />
                       <button
-                        onClick={async () => {
-                          if (item.quantity >= item.stock) {
-                            Swal.fire({
-                              icon: 'warning',
-                              title: 'Vượt quá tồn kho',
-                              text: `Chỉ còn ${item.stock} sản phẩm trong kho`,
-                              confirmButtonText: 'OK',
-                              customClass: {
-                                popup: styles.swalPopup,
-                                title: styles.swalTitle,
-                                htmlContainer: styles.swalText,
-                                confirmButton: styles.swalBtn,
-                              },
-                              buttonsStyling: false,
-                            });
-
-                            return;
-                          }
-
-                          await increaseQty(item);
+                        onClick={() => increaseQty(item)}
+                        disabled={item.quantity >= item.stock}
+                        style={{
+                          cursor:
+                            item.quantity >= item.stock
+                              ? 'not-allowed'
+                              : 'pointer',
+                          opacity: item.quantity >= item.stock ? 0.5 : 1,
                         }}
                       >
                         +
                       </button>
-                      {/* <span>{item.quantity}</span>
-                      <button onClick={() => increaseQty(item)}>+</button> */}
                     </div>
                     <button
                       className={styles.deleteBtn}

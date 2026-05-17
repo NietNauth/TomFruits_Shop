@@ -190,32 +190,16 @@ function DetailProduct() {
               </div>
               <div className={qtyWrapper}>
                 <p className={qtyLabel}>Số lượng</p>
-                <div className={styles.qtyRow}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                   <div className={qtyBox}>
-                    <button
-                      onClick={() => setQty(qty > 1 ? qty - 1 : 1)}
-                      disabled={product.status === 'out_of_stock'}
-                    >
+                    <button onClick={() => setQty(qty > 1 ? qty - 1 : 1)} disabled={product.status === 'out_of_stock'}>
                       -
                     </button>
                     <span>{qty}</span>
-                    <button
-                      onClick={() => {
-                        if (qty >= product.quantity) {
-                          showMessage('warn', 'Số lượng vượt quá tồn kho');
-                          return;
-                        }
-
-                        setQty(qty + 1);
-                      }}
-                      // onClick={() => setQty(qty + 1)}
-                      disabled={product.status === 'out_of_stock'}
-                    >
-                      +
-                    </button>
+                    <button onClick={() => setQty(qty < product.quantity ? qty + 1 : qty)} disabled={product.status === 'out_of_stock' || qty >= product.quantity}>+</button>
                   </div>
-                  <span className={styles.stockText}>
-                    Còn {product.quantity} sản phẩm
+                  <span style={{ color: '#6b7280', fontSize: '14px', fontWeight: '400' }}>
+                    {product.quantity > 0 ? `Còn ${product.quantity} sản phẩm` : 'Hết hàng'}
                   </span>
                 </div>
               </div>
@@ -256,12 +240,9 @@ function DetailProduct() {
                       img: imgUrl,
                       unit: product.unit,
                       quantity: qty,
-                    });
-                    setAdded(true);
-                    setTimeout(() => {
-                      setAdded(false);
-                    }, 1500);
-                  }}
+                      stock: product.quantity,
+                    })
+                  }
                 >
                   {product.status === 'out_of_stock' ? (
                     'Hết hàng'

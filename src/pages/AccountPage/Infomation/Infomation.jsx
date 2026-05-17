@@ -11,7 +11,7 @@ import {
 import authService from '../../../apis/authService';
 import { useAuth } from '../../../hooks/useAuth';
 import { storage } from '../../../utils/storage';
-import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 function Infomation() {
   const { user, setUser } = useAuth();
@@ -89,9 +89,22 @@ function Infomation() {
       if (setUser) setUser(updatedUser);
 
       setSuccessMsg('Cập nhật thông tin thành công!');
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Đã lưu các thay đổi thông tin cá nhân của bạn.',
+        icon: 'success',
+        confirmButtonColor: '#10b981',
+        confirmButtonText: 'Đồng ý',
+      });
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err) {
-      toast.error(err.message || 'Cập nhật thất bại!');
+      Swal.fire({
+        title: 'Thất bại!',
+        text: err.message || 'Cập nhật thông tin thất bại.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Thử lại',
+      });
     }
   };
   return (

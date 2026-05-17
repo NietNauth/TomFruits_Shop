@@ -2,6 +2,7 @@ import { useState } from 'react';
 import styles from './styles.module.scss';
 import { CircleCheckBig, CircleX } from 'lucide-react';
 import authService from '../../../apis/authService';
+import Swal from 'sweetalert2';
 
 function ChangePassword() {
   const [form, setForm] = useState({ current: '', newPass: '', confirm: '' });
@@ -74,14 +75,28 @@ function ChangePassword() {
         password: form.newPass,
         password_confirmation: form.confirm,
       });
-      showMessage('success', 'Đổi mật khẩu thành công!');
+      Swal.fire({
+        title: 'Thành công!',
+        text: 'Mật khẩu của bạn đã được cập nhật thành công.',
+        icon: 'success',
+        confirmButtonColor: '#10b981',
+        confirmButtonText: 'Đồng ý',
+      });
+      setSuccessMsg('Đổi mật khẩu thành công!');
+      setTimeout(() => setSuccessMsg(''), 3000);
       setForm({ current: '', newPass: '', confirm: '' });
       setErrors({
         newPass: '',
         confirm: '',
       });
     } catch (err) {
-      showMessage('error', err.message || 'Đổi mật khẩu thất bại!');
+      Swal.fire({
+        title: 'Thất bại!',
+        text: err.message || 'Đổi mật khẩu thất bại!',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Đồng ý',
+      });
     }
   };
 

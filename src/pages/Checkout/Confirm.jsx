@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { MapPin, CreditCard, CheckCircle, Truck } from 'lucide-react';
 import MyHeader from '../../components/Header/Header';
 import MyFooter from '../../components/Footer/Footer';
-import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 import orderService from '../../apis/orderService';
 import cartService from '../../apis/cartService';
 import { useAuth } from '../../contexts/AuthContext';
@@ -42,7 +42,7 @@ function ConfirmPage() {
   );
   
   const shippingInfo = JSON.parse(localStorage.getItem('shipping')) || {};
-  const paymentMethod = localStorage.getItem('paymentMethod') || 'Chuyển khoản ngân hàng';
+  const paymentMethod = localStorage.getItem('paymentMethod') || 'bank';
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -120,7 +120,13 @@ function ConfirmPage() {
       localStorage.setItem('orderTotal', total.toString());
       navigate('/checkout/success', { state: { order: res.data }, replace: true });
     } catch (err) {
-      toast.error(err.message || 'Đặt hàng thất bại, vui lòng thử lại!');
+      Swal.fire({
+        title: 'Đặt hàng thất bại!',
+        text: err.message || 'Có lỗi xảy ra trong quá trình đặt hàng. Vui lòng thử lại!',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Đồng ý'
+      });
     } finally {
       setIsSubmitting(false);
     }

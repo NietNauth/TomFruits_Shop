@@ -2,18 +2,7 @@ import { useState, useEffect } from 'react';
 import addressService from '../../../apis/addressService';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-
-import {
-  X,
-  Plus,
-  MapPin,
-  Phone,
-  User,
-  Pencil,
-  Trash2,
-  CheckCircle2,
-} from 'lucide-react';
-import styles from './styles.module.scss';
+import { Plus, MapPin, Phone, User, Trash2, CheckCircle2 } from 'lucide-react';
 
 const PROVINCE_API = 'https://provinces.open-api.vn/api';
 
@@ -75,12 +64,15 @@ function AddressBook() {
   const fetchAddresses = async () => {
     try {
       const res = await addressService.getAddresses();
-
-      if (res.success) {
-        setAddresses(res.data);
-      }
-    } catch (error) {
-      showPopup('error', 'Lỗi tải danh sách địa chỉ');
+      if (res.success) setAddresses(res.data);
+    } catch (err) {
+      Swal.fire({
+        title: 'Thất bại!',
+        text: 'Lỗi tải danh sách địa chỉ. Vui lòng thử lại!',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Đồng ý',
+      });
     }
   };
 
@@ -279,48 +271,65 @@ function AddressBook() {
         : await addressService.createAddress(formData);
 
       if (res.success) {
-        showPopup(
-          'success',
-          editingId ? 'Cập nhật địa chỉ thành công' : 'Thêm địa chỉ thành công'
-        );
-
-        fetchAddresses();
+        Swal.fire({
+          title: 'Thành công!',
+          text: 'Thêm địa chỉ mới thành công!',
+          icon: 'success',
+          confirmButtonColor: '#10b981',
+          confirmButtonText: 'Đồng ý',
+        });
         setShowForm(false);
         resetForm();
         setEditingId(null);
       }
-    } catch (error) {
-      showPopup('error', error.message || 'Lỗi khi lưu địa chỉ');
+    } catch (err) {
+      Swal.fire({
+        title: 'Thất bại!',
+        text: err.message || 'Lỗi khi lưu địa chỉ.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Đồng ý',
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    const result = await Swal.fire({
+    Swal.fire({
       title: 'Xóa địa chỉ?',
-      text: 'Bạn có chắc muốn xóa địa chỉ này không?',
+      text: 'Bạn có chắc chắn muốn xóa địa chỉ này? Thao tác này không thể hoàn tác.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Xóa',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Xóa ngay',
       cancelButtonText: 'Hủy',
-      confirmButtonColor: '#dc2626',
-      cancelButtonColor: '#16a34a',
-      reverseButtons: true,
-    });
-
-    if (!result.isConfirmed) return;
-
-    try {
-      const res = await addressService.deleteAddress(id);
-
-      if (res.success) {
-        showPopup('success', 'Đã xóa địa chỉ');
-        fetchAddresses();
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await addressService.deleteAddress(id);
+          if (res.success) {
+            Swal.fire({
+              title: 'Đã xóa!',
+              text: 'Địa chỉ đã được xóa thành công.',
+              icon: 'success',
+              confirmButtonColor: '#10b981',
+              confirmButtonText: 'Đồng ý',
+            });
+            fetchAddresses();
+          }
+        } catch (err) {
+          Swal.fire({
+            title: 'Thất bại!',
+            text: err.message || 'Lỗi khi xóa địa chỉ.',
+            icon: 'error',
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'Đồng ý',
+          });
+        }
       }
-    } catch (error) {
-      showPopup('error', error.message || 'Lỗi khi xóa địa chỉ');
-    }
+    });
   };
 
   const handleSetDefault = async (id) => {
@@ -328,11 +337,23 @@ function AddressBook() {
       const res = await addressService.setDefault(id);
 
       if (res.success) {
-        showPopup('success', 'Đã đặt làm mặc định');
+        Swal.fire({
+          title: 'Thành công!',
+          text: 'Đã đặt địa chỉ này làm mặc định.',
+          icon: 'success',
+          confirmButtonColor: '#10b981',
+          confirmButtonText: 'Đồng ý',
+        });
         fetchAddresses();
       }
-    } catch (error) {
-      showPopup('error', error.message || 'Lỗi hệ thống');
+    } catch (err) {
+      Swal.fire({
+        title: 'Thất bại!',
+        text: err.message || 'Lỗi hệ thống.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Đồng ý',
+      });
     }
   };
 
