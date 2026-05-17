@@ -26,10 +26,21 @@ class CartController extends Controller
         $productId = $request->product_id;
         $quantity = $request->quantity;
 
+        $product = \App\Models\Product::findOrFail($productId);
         $cart = Cart::where('user_id', $userId)->where('product_id', $productId)->first();
 
+        $currentInCart = $cart ? $cart->quantity : 0;
+        $newTotal = $currentInCart + $quantity;
+
+        if ($newTotal > $product->quantity) {
+            return response()->json([
+                'success' => false,
+                'message' => "Số lượng sản phẩm vượt quá tồn kho hiện tại (Tối đa còn lại: {$product->quantity})"
+            ], 400);
+        }
+
         if ($cart) {
-            $cart->quantity += $quantity;
+            $cart->quantity = $newTotal;
             $cart->save();
         } else {
             $cart = Cart::create([
@@ -54,6 +65,21 @@ class CartController extends Controller
 
         $userId = auth('api')->id();
         $cart = Cart::where('user_id', $userId)->findOrFail($id);
+        
+        $product = $cart->product;
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sản phẩm không tồn tại.'
+            ], 404);
+        }
+
+        if ($request->quantity > $product->quantity) {
+            return response()->json([
+                'success' => false,
+                'message' => "Số lượng sản phẩm vượt quá tồn kho hiện tại (Tối đa còn lại: {$product->quantity})"
+            ], 400);
+        }
 
         $cart->quantity = $request->quantity;
         $cart->save();
