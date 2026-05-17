@@ -6,7 +6,7 @@ import { FaFacebook } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { Leaf } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 function Login() {
   const {
     container,
@@ -32,8 +32,15 @@ function Login() {
 
     const result = await login({ email, password });
     if (result.success) {
-      toast.success('Đăng nhập thành công!');
-      navigate('/');
+      Swal.fire({
+        title: 'Đăng nhập thành công!',
+        text: 'Chào mừng bạn quay trở lại với Tom Fruits!',
+        icon: 'success',
+        confirmButtonColor: '#10b981',
+        confirmButtonText: 'Đồng ý'
+      }).then(() => {
+        navigate('/');
+      });
     } else {
       setLoginError(result.message || 'Email hoặc mật khẩu không đúng!');
     }

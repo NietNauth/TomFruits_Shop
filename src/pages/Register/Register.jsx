@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Leaf } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
-import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 function Register() {
   const {
@@ -109,8 +109,15 @@ function Register() {
 
     const result = await register({ name, email, password, password_confirmation: confirmPassword, phone });
     if (result.success) {
-      toast.success('Đăng ký thành công!');
-      navigate('/');
+      Swal.fire({
+        title: 'Đăng ký thành công!',
+        text: 'Chào mừng bạn đến với Tom Fruits! Tài khoản của bạn đã được đăng ký thành công.',
+        icon: 'success',
+        confirmButtonColor: '#10b981',
+        confirmButtonText: 'Đồng ý'
+      }).then(() => {
+        navigate('/');
+      });
     } else {
       setAgreeError(result.message);
     }

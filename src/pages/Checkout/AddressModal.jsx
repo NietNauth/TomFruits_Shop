@@ -3,7 +3,7 @@ import styles from './styles.module.scss';
 import axios from 'axios';
 import { X, MapPin, User, Phone, Check, Plus, Edit2, Trash2, ArrowLeft } from 'lucide-react';
 import addressService from '../../apis/addressService';
-import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 const PROVINCE_API = 'https://provinces.open-api.vn/api';
 
@@ -132,7 +132,13 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.receiver_name || !formData.receiver_phone || !formData.province || !formData.district || !formData.ward || !formData.address_detail) {
-      toast.warn('Vui lòng nhập đầy đủ thông tin');
+      Swal.fire({
+        title: 'Cảnh báo!',
+        text: 'Vui lòng nhập đầy đủ thông tin địa chỉ',
+        icon: 'warning',
+        confirmButtonColor: '#f59e0b',
+        confirmButtonText: 'Đồng ý'
+      });
       return;
     }
 
@@ -140,29 +146,71 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
     try {
       if (editId) {
         await addressService.updateAddress(editId, formData);
-        toast.success('Cập nhật địa chỉ thành công!');
+        Swal.fire({
+          title: 'Thành công!',
+          text: 'Cập nhật địa chỉ thành công!',
+          icon: 'success',
+          confirmButtonColor: '#10b981',
+          confirmButtonText: 'Đồng ý'
+        });
       } else {
         await addressService.createAddress(formData);
-        toast.success('Thêm địa chỉ mới thành công!');
+        Swal.fire({
+          title: 'Thành công!',
+          text: 'Thêm địa chỉ mới thành công!',
+          icon: 'success',
+          confirmButtonColor: '#10b981',
+          confirmButtonText: 'Đồng ý'
+        });
       }
       onRefresh();
       setView('list');
     } catch (err) {
-      toast.error(err.message || 'Có lỗi xảy ra');
+      Swal.fire({
+        title: 'Thất bại!',
+        text: err.message || 'Có lỗi xảy ra trong quá trình lưu địa chỉ.',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Đồng ý'
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) return;
-    try {
-      await addressService.deleteAddress(id);
-      toast.success('Đã xóa địa chỉ');
-      onRefresh();
-    } catch (err) {
-      toast.error(err.message || 'Không thể xóa địa chỉ');
-    }
+    Swal.fire({
+      title: 'Xóa địa chỉ?',
+      text: 'Bạn có chắc chắn muốn xóa địa chỉ này? Thao tác này không thể hoàn tác.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Xóa ngay',
+      cancelButtonText: 'Hủy'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await addressService.deleteAddress(id);
+          Swal.fire({
+            title: 'Đã xóa!',
+            text: 'Địa chỉ đã được xóa thành công.',
+            icon: 'success',
+            confirmButtonColor: '#10b981',
+            confirmButtonText: 'Đồng ý'
+          });
+          onRefresh();
+        } catch (err) {
+          Swal.fire({
+            title: 'Thất bại!',
+            text: err.message || 'Không thể xóa địa chỉ này.',
+            icon: 'error',
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'Đồng ý'
+          });
+        }
+      }
+    });
   };
 
   if (!isOpen) return null;

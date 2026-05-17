@@ -21,6 +21,7 @@ function Cart() {
             price: item.product.price,
             img: item.product.image_url,
             quantity: item.quantity,
+            stock: item.product.quantity,
           }));
           setCartItems(items);
         } else {

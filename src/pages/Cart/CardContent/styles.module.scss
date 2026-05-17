@@ -141,10 +141,25 @@
     }
   }
 
-  span {
-    min-width: 20px;
+  input {
+    width: 35px;
+    border: none;
+    background: none;
     text-align: center;
     font-weight: 500;
+    font-size: 14px;
+    outline: none;
+    color: #333;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    &[type=number] {
+      -moz-appearance: textfield;
+    }
   }
 }
 

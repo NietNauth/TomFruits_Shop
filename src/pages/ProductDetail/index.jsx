@@ -159,12 +159,17 @@ function DetailProduct() {
               </div>
               <div className={qtyWrapper}>
                 <p className={qtyLabel}>Số lượng</p>
-                <div className={qtyBox}>
-                  <button onClick={() => setQty(qty > 1 ? qty - 1 : 1)} disabled={product.status === 'out_of_stock'}>
-                    -
-                  </button>
-                  <span>{qty}</span>
-                  <button onClick={() => setQty(qty + 1)} disabled={product.status === 'out_of_stock'}>+</button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <div className={qtyBox}>
+                    <button onClick={() => setQty(qty > 1 ? qty - 1 : 1)} disabled={product.status === 'out_of_stock'}>
+                      -
+                    </button>
+                    <span>{qty}</span>
+                    <button onClick={() => setQty(qty < product.quantity ? qty + 1 : qty)} disabled={product.status === 'out_of_stock' || qty >= product.quantity}>+</button>
+                  </div>
+                  <span style={{ color: '#6b7280', fontSize: '14px', fontWeight: '400' }}>
+                    {product.quantity > 0 ? `Còn ${product.quantity} sản phẩm` : 'Hết hàng'}
+                  </span>
                 </div>
               </div>
               <p className={styles.totalBar}>
@@ -190,6 +195,7 @@ function DetailProduct() {
                       img: imgUrl,
                       unit: product.unit,
                       quantity: qty,
+                      stock: product.quantity,
                     })
                   }
                 >

@@ -70,8 +70,19 @@ function CheckoutPage() {
     }
 
     if (isLoggedIn) {
-      // Check for empty cart
-      if (!buyNowData) {
+      if (buyNowData) {
+        // Sync buy-now product to server cart by clearing existing and adding the item
+        const syncBuyNow = async () => {
+          try {
+            await cartService.clearCart();
+            await cartService.addItem(buyNowData.product.id, buyNowData.quantity);
+          } catch (err) {
+            console.error('Failed to sync Buy Now product to server cart:', err);
+          }
+        };
+        syncBuyNow();
+      } else {
+        // Check for empty cart
         cartService.getCart().then((res) => {
           if (!res.data || res.data.length === 0) {
             navigate('/cart');
@@ -101,7 +112,7 @@ function CheckoutPage() {
         }
       });
     }
-  }, [isLoggedIn, buyNowData]);
+  }, [isLoggedIn, buyNowData, navigate]);
 
 
   const formatAddressDisplay = (addr) => {

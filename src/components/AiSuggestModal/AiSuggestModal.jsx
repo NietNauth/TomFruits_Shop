@@ -4,7 +4,7 @@ import ProductCard from '../ProductCard/ProductCard';
 import productService from '../../apis/productService';
 import categoryService from '../../apis/categoryService';
 import aiService from '../../apis/aiService';
-import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 // ─── AiSuggestModal ───────────────────────────────────────────────────────────
 
@@ -101,7 +101,13 @@ export default function AiSuggestModal({ open, onClose }) {
       setSearched(true);
     } catch (error) {
       console.error('AI Suggest error:', error);
-      toast.error("Có lỗi xảy ra khi gọi trợ lý AI.");
+      Swal.fire({
+        title: 'Lỗi trợ lý AI!',
+        text: 'Có lỗi xảy ra khi gọi trợ lý AI. Vui lòng kiểm tra lại!',
+        icon: 'error',
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Đồng ý'
+      });
     } finally {
       setLoading(false);
     }

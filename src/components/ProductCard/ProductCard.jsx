@@ -13,6 +13,7 @@ function ProductCard({
   img,
   unit,
   status,
+  stock,
 }) {
   const navigate = useNavigate();
   const {
@@ -27,9 +28,9 @@ function ProductCard({
     unitText,
     bottom,
     priceText,
+    soldOutOverlay,
     oldPriceText,
     btn,
-    soldOutOverlay,
   } = styles;
 
   const isSoldOut = status === 'out_of_stock';
@@ -89,7 +90,7 @@ function ProductCard({
             onClick={(e) => {
               e.stopPropagation();
               if (isSoldOut) return;
-              addToCart({ id, name, price, img, unit, quantity: 1 });
+              addToCart({ id, name, price, img, unit, quantity: 1, stock: stock || 999 });
             }}
           >
             <FaShoppingCart />
