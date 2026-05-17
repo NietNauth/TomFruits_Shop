@@ -19,6 +19,8 @@ class UserUpdateRequest extends FormRequest
             'email' => ['sometimes', 'email', Rule::unique('users')->ignore($this->route('user'))],
             'password' => 'sometimes|string|min:6',
             'phone' => 'nullable|string|max:20',
+            'dob' => 'nullable|date',
+            'gender' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
             'avatar' => 'nullable|string',
             'is_active' => 'boolean'

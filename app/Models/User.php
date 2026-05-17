@@ -29,6 +29,8 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'phone',
+        'dob',
+        'gender',
         'avatar',
         'is_active',
     ];
@@ -59,6 +61,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(UserAddress::class);
     }
 
+    /**
+     * Get the user's orders.
+     */
     public function orders()
     {
         return $this->hasMany(Order::class);

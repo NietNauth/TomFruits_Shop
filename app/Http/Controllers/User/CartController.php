@@ -27,25 +27,20 @@ class CartController extends Controller
         $quantity = $request->quantity;
 
         $product = \App\Models\Product::findOrFail($productId);
-        
-        if ($product->quantity <= 0) {
+        $cart = Cart::where('user_id', $userId)->where('product_id', $productId)->first();
+
+        $currentInCart = $cart ? $cart->quantity : 0;
+        $newTotal = $currentInCart + $quantity;
+
+        if ($newTotal > $product->quantity) {
             return response()->json([
                 'success' => false,
-                'message' => 'Sản phẩm này đã hết hàng'
+                'message' => "Số lượng sản phẩm vượt quá tồn kho hiện tại (Tối đa còn lại: {$product->quantity})"
             ], 400);
         }
 
-        $cart = Cart::where('user_id', $userId)->where('product_id', $productId)->first();
-
         if ($cart) {
-            $newQuantity = $cart->quantity + $quantity;
-            if ($newQuantity > $product->quantity) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Số lượng trong giỏ hàng vượt quá tồn kho hiện tại (Tối đa: ' . $product->quantity . ')'
-                ], 400);
-            }
-            $cart->quantity = $newQuantity;
+            $cart->quantity = $newTotal;
             $cart->save();
         } else {
             if ($quantity > $product->quantity) {
@@ -75,12 +70,20 @@ class CartController extends Controller
         ]);
 
         $userId = auth('api')->id();
-        $cart = Cart::with('product')->where('user_id', $userId)->findOrFail($id);
+        $cart = Cart::where('user_id', $userId)->findOrFail($id);
         
-        if ($request->quantity > $cart->product->quantity) {
+        $product = $cart->product;
+        if (!$product) {
             return response()->json([
                 'success' => false,
-                'message' => 'Số lượng vượt quá tồn kho hiện tại (Tối đa: ' . $cart->product->quantity . ')'
+                'message' => 'Sản phẩm không tồn tại.'
+            ], 404);
+        }
+
+        if ($request->quantity > $product->quantity) {
+            return response()->json([
+                'success' => false,
+                'message' => "Số lượng sản phẩm vượt quá tồn kho hiện tại (Tối đa còn lại: {$product->quantity})"
             ], 400);
         }
 

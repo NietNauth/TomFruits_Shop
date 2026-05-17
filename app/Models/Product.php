@@ -11,6 +11,19 @@ class Product extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function booted()
+    {
+        static::saving(function ($product) {
+            if ($product->quantity <= 0) {
+                $product->status = 'out_of_stock';
+            } else {
+                if ($product->status === 'out_of_stock') {
+                    $product->status = 'in_stock';
+                }
+            }
+        });
+    }
+
     protected $fillable = [
         'category_id',
         'name',
