@@ -59,10 +59,14 @@ function OrderHistory() {
   if (orders.length === 0) {
     return (
       <div className={styles.container}>
-        <h3>📦 Danh sách đơn hàng</h3>
-        <div className={styles.empty}>
-          <p>Bạn chưa có đơn hàng nào.</p>
-        </div>
+        <MyHeader />
+        <MainLayout>
+          <h3>📦 Danh sách đơn hàng</h3>
+          <div className={styles.empty}>
+            <p>Bạn chưa có đơn hàng nào.</p>
+          </div>
+        </MainLayout>
+        <MyFooter />
       </div>
     );
   }

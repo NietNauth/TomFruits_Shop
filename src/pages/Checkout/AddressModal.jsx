@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './styles.module.scss';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 import {
   X,
   MapPin,
@@ -38,26 +37,7 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
     address_detail: '',
     is_default: false,
   });
-  const [message, setMessage] = useState({
-    show: false,
-    type: '',
-    text: '',
-  });
-  const showMessage = (type, text) => {
-    setMessage({
-      show: true,
-      type,
-      text,
-    });
 
-    setTimeout(() => {
-      setMessage({
-        show: false,
-        type: '',
-        text: '',
-      });
-    }, 2500);
-  };
   // Fetch provinces once
   useEffect(() => {
     if (isOpen) {
@@ -161,7 +141,7 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
       setFormData((prev) => ({ ...prev, [field]: value }));
     }
   };
-  const phoneRegex = /^(0[35789])[0-9]{8}$/;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (
@@ -258,11 +238,6 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        {message.show && (
-          <div className={`${styles.messagePopup} ${styles[message.type]}`}>
-            {message.text}
-          </div>
-        )}
         {/* HEADER */}
         <div className={styles.modalHeader}>
           <div className={styles.headerLeft}>
@@ -363,17 +338,10 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
                 <input
                   type='text'
                   placeholder='Họ tên...'
-                  required
                   value={formData.receiver_name}
                   onChange={(e) =>
                     handleChange('receiver_name', e.target.value)
                   }
-                  onInvalid={(e) =>
-                    e.target.setCustomValidity(
-                      'Vui lòng xác nhập tên người nhận!'
-                    )
-                  }
-                  onInput={(e) => e.target.setCustomValidity('')}
                 />
               </div>
               <div className={styles.formGroup}>
@@ -383,22 +351,10 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
                 <input
                   type='text'
                   placeholder='Số điện thoại...'
-                  required
                   value={formData.receiver_phone}
                   onChange={(e) =>
                     handleChange('receiver_phone', e.target.value)
                   }
-                  pattern='^(0[35789])[0-9]{8}$'
-                  onInvalid={(e) => {
-                    if (e.target.validity.valueMissing) {
-                      e.target.setCustomValidity(
-                        'Vui lòng nhập số điện thoại!'
-                      );
-                    } else {
-                      e.target.setCustomValidity('Số điện thoại không hợp lệ!');
-                    }
-                  }}
-                  onInput={(e) => e.target.setCustomValidity('')}
                 />
               </div>
             </div>
@@ -410,11 +366,6 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
               <select
                 value={formData.province}
                 onChange={(e) => handleChange('province', e.target.value)}
-                required
-                onInvalid={(e) =>
-                  e.target.setCustomValidity('Vui lòng chọn tỉnh/thành!')
-                }
-                onInput={(e) => e.target.setCustomValidity('')}
               >
                 <option value=''>Chọn Tỉnh/Thành</option>
                 {provinces.map((p) => (
@@ -432,11 +383,6 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
                   value={formData.district}
                   onChange={(e) => handleChange('district', e.target.value)}
                   disabled={!formData.province}
-                  required
-                  onInvalid={(e) =>
-                    e.target.setCustomValidity('Vui lòng chọn Quận/Huyện!')
-                  }
-                  onInput={(e) => e.target.setCustomValidity('')}
                 >
                   <option value=''>Chọn Quận/Huyện</option>
                   {districts.map((d) => (
@@ -452,11 +398,6 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
                   value={formData.ward}
                   onChange={(e) => handleChange('ward', e.target.value)}
                   disabled={!formData.district}
-                  required
-                  onInvalid={(e) =>
-                    e.target.setCustomValidity('Vui lòng chọn Phường/Xã!')
-                  }
-                  onInput={(e) => e.target.setCustomValidity('')}
                 >
                   <option value=''>Chọn Phường/Xã</option>
                   {wards.map((w) => (
@@ -474,11 +415,6 @@ function AddressModal({ isOpen, onClose, addresses, onSelect, onRefresh }) {
                 placeholder='Số nhà, tên đường...'
                 value={formData.address_detail}
                 onChange={(e) => handleChange('address_detail', e.target.value)}
-                required
-                onInvalid={(e) =>
-                  e.target.setCustomValidity('Vui lòng nhập địa chỉ cụ thể!')
-                }
-                onInput={(e) => e.target.setCustomValidity('')}
               />
             </div>
 

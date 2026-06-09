@@ -280,9 +280,19 @@
       line-height: 1.6;
       font-size: 16px;
       color: #1a1a1a;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
     }
   }
   .richText {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+    line-height: 1.7;
     ul,
     ol {
       padding-left: 20px;

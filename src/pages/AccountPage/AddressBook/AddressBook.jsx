@@ -2,7 +2,17 @@ import { useState, useEffect } from 'react';
 import addressService from '../../../apis/addressService';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { Plus, MapPin, Phone, User, Trash2, CheckCircle2 } from 'lucide-react';
+import styles from './styles.module.scss';
+import {
+  Plus,
+  X,
+  MapPin,
+  Phone,
+  User,
+  Trash2,
+  CheckCircle2,
+  Pencil,
+} from 'lucide-react';
 
 const PROVINCE_API = 'https://provinces.open-api.vn/api';
 

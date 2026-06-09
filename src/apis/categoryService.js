@@ -6,7 +6,7 @@ const categoryService = {
    * Response: { success, data: [{ id, title }, ...] }
    */
   getAll: () => axiosClient.get('/categories'),
-
+  getHome: () => axiosClient.get('/categories/home'),
   /**
    * GET /categories/{id}
    */

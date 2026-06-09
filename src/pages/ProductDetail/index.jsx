@@ -38,7 +38,7 @@ function DetailProduct() {
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [added, setAdded] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -190,16 +190,39 @@ function DetailProduct() {
               </div>
               <div className={qtyWrapper}>
                 <p className={qtyLabel}>Số lượng</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: '15px' }}
+                >
                   <div className={qtyBox}>
-                    <button onClick={() => setQty(qty > 1 ? qty - 1 : 1)} disabled={product.status === 'out_of_stock'}>
+                    <button
+                      onClick={() => setQty(qty > 1 ? qty - 1 : 1)}
+                      disabled={product.status === 'out_of_stock'}
+                    >
                       -
                     </button>
                     <span>{qty}</span>
-                    <button onClick={() => setQty(qty < product.quantity ? qty + 1 : qty)} disabled={product.status === 'out_of_stock' || qty >= product.quantity}>+</button>
+                    <button
+                      onClick={() =>
+                        setQty(qty < product.quantity ? qty + 1 : qty)
+                      }
+                      disabled={
+                        product.status === 'out_of_stock' ||
+                        qty >= product.quantity
+                      }
+                    >
+                      +
+                    </button>
                   </div>
-                  <span style={{ color: '#6b7280', fontSize: '14px', fontWeight: '400' }}>
-                    {product.quantity > 0 ? `Còn ${product.quantity} sản phẩm` : 'Hết hàng'}
+                  <span
+                    style={{
+                      color: '#6b7280',
+                      fontSize: '14px',
+                      fontWeight: '400',
+                    }}
+                  >
+                    {product.quantity > 0
+                      ? `Còn ${product.quantity} sản phẩm`
+                      : 'Hết hàng'}
                   </span>
                 </div>
               </div>
@@ -220,19 +243,14 @@ function DetailProduct() {
                   disabled={product.status === 'out_of_stock'}
                   style={{
                     background:
-                      product.status === 'out_of_stock'
-                        ? '#999'
-                        : added
-                          ? '#22c55e'
-                          : '#16a34a',
+                      product.status === 'out_of_stock' ? '#999' : '#16a34a',
                     cursor:
                       product.status === 'out_of_stock'
                         ? 'not-allowed'
                         : 'pointer',
                     opacity: product.status === 'out_of_stock' ? 0.7 : 1,
                   }}
-                  onClick={() => {
-                    if (product.status === 'out_of_stock') return;
+                  onClick={() =>
                     addToCart({
                       id: product.id,
                       name: product.name,
@@ -244,16 +262,10 @@ function DetailProduct() {
                     })
                   }
                 >
-                  {product.status === 'out_of_stock' ? (
-                    'Hết hàng'
-                  ) : added ? (
-                    '✓ Đã thêm'
-                  ) : (
-                    <>
-                      <FaShoppingCart />
-                      <span> Thêm vào giỏ hàng</span>
-                    </>
-                  )}
+                  <FaShoppingCart />
+                  {product.status === 'out_of_stock'
+                    ? 'Hết hàng'
+                    : 'Thêm vào giỏ hàng'}
                 </button>
                 <button
                   className={styles.btnOutline}
@@ -307,7 +319,9 @@ function DetailProduct() {
               {activeTab === 'desc' && (
                 <div
                   className={styles.richText}
-                  dangerouslySetInnerHTML={{ __html: product?.description }}
+                  dangerouslySetInnerHTML={{
+                    __html: product?.description?.replace(/\s+/g, ' ').trim(),
+                  }}
                 />
               )}
               {activeTab === 'nutri' && (
@@ -316,7 +330,9 @@ function DetailProduct() {
                     <div
                       className={styles.richText}
                       dangerouslySetInnerHTML={{
-                        __html: product.nutritional_info,
+                        __html: product.nutritional_info
+                          ?.replace(/\s+/g, ' ')
+                          .trim(),
                       }}
                     />
                   ) : (
