@@ -6,10 +6,6 @@ import categoryService from '../../apis/categoryService';
 import aiService from '../../apis/aiService';
 import Swal from 'sweetalert2';
 
-// ─── AiSuggestModal ───────────────────────────────────────────────────────────
-
-// ─── AiSuggestModal ───────────────────────────────────────────────────────────
-
 export default function AiSuggestModal({ open, onClose }) {
   const [query, setQuery] = useState('');
   const [foodFilter, setFoodFilter] = useState([]);
@@ -49,18 +45,18 @@ export default function AiSuggestModal({ open, onClose }) {
       let finalProducts = [];
       const q = query.trim();
 
-      // ── BƯỚC 1: XỬ LÝ AI ──────────────────────────────────────────────────
+      // ── BƯỚC 1: XỬ LÝ AI (Promise.race 3.5s timeout) ──────────────────────
       if (q) {
-        try {
-          const aiResult = await aiService.generateSuggestion(q);
-          setAiMessage(aiResult.ai_response);
-          setRecipe(aiResult.recipe);
-          keywords = aiResult.search_keywords || [q];
-        } catch (err) {
-          console.warn("AI Fallback mode");
-          keywords = [q]; // Fallback về keyword gốc
-          setAiMessage("Tôi sẽ tìm kiếm sản phẩm phù hợp dựa trên yêu cầu của bạn...");
-        }
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Trợ lý AI phản hồi quá hạn thời gian (3.5 giây).")), 3500)
+        );
+        const aiResult = await Promise.race([
+          aiService.generateSuggestion(q),
+          timeoutPromise
+        ]);
+        setAiMessage(aiResult.ai_response);
+        setRecipe(aiResult.recipe);
+        keywords = aiResult.search_keywords || [q];
       }
 
       // ── BƯỚC 2: TÌM KIẾM SẢN PHẨM ──────────────────────────────────────────
@@ -103,7 +99,7 @@ export default function AiSuggestModal({ open, onClose }) {
       console.error('AI Suggest error:', error);
       Swal.fire({
         title: 'Lỗi trợ lý AI!',
-        text: 'Có lỗi xảy ra khi gọi trợ lý AI. Vui lòng kiểm tra lại!',
+        text: error.message || 'Có lỗi xảy ra khi gọi trợ lý AI. Vui lòng kiểm tra lại!',
         icon: 'error',
         confirmButtonColor: '#ef4444',
         confirmButtonText: 'Đồng ý'

@@ -12,7 +12,7 @@ const aiService = {
        throw new Error("Vui lòng cấu hình VITE_GEMINI_API_KEY trong file .env");
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const prompt = `
       Bạn là một trợ lý mua sắm thông minh tên là "Tom Bot" cho cửa hàng "Tom Fruits Shop".
