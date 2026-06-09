@@ -19,7 +19,7 @@ class CategoryController extends Controller
             $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        $categories = $query->orderBy('id', 'desc')->paginate($request->get('per_page', 15));
+        $categories = $query->orderBy('id', 'asc')->paginate($request->get('per_page', 15));
 
         return response()->json([
             'success' => true,

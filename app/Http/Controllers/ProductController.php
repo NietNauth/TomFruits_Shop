@@ -52,11 +52,11 @@ class ProductController extends Controller
                     $query->orderBy('name', 'desc');
                     break;
                 default:
-                    $query->latest();
+                    $query->orderBy('id', 'asc');
                     break;
             }
         } else {
-            $query->latest();
+            $query->orderBy('id', 'asc');
         }
 
         $products = $query->paginate($request->get('per_page', 15));

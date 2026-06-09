@@ -20,7 +20,7 @@ class ProductUpdateRequest extends FormRequest
             'old_price' => 'nullable|numeric|min:0',
             'discount' => 'nullable|numeric|min:0',
             'tag' => 'nullable|in:sale,hot,new,',
-            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             'unit' => 'nullable|string|max:50',
             'weight' => 'nullable|numeric|min:0',
             'quantity' => 'sometimes|integer|min:0',

@@ -28,6 +28,7 @@ Route::get('products/{id}', [ProductController::class, 'show']);
 // Route::get('products/{id}/reviews', [ProductController::class, 'reviews']);
 
 Route::get('categories', [PublicCategoryController::class, 'index']);
+Route::get('categories/home', [PublicCategoryController::class, 'homeCategories']);
 Route::get('categories/{id}', [PublicCategoryController::class, 'show']);
 Route::get('stores', [\App\Http\Controllers\StoreController::class, 'index']);
 

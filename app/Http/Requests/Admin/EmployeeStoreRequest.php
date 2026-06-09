@@ -17,7 +17,7 @@ class EmployeeStoreRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:employees',
             'password' => 'required|string|min:6',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|regex:/^(0[3|5|7|8|9])[0-9]{8}$/',
             'address' => 'nullable|string|max:255',
             'avatar' => 'nullable|string',
             'role' => 'required|in:admin,manager,staff',
@@ -36,6 +36,8 @@ class EmployeeStoreRequest extends FormRequest
             'email.unique'      => 'Email đã tồn tại',
             'password.required' => 'Vui lòng nhập mật khẩu',
             'password.min'      => 'Mật khẩu phải có ít nhất 6 ký tự',
+            'password.max'       => 'Mật khẩu không được vượt quá 50 ký tự',
+            'phone.regex'        => 'Số điện thoại không hợp lệ',
             'role.required'     => 'Vui lòng chọn vai trò',
             'role.in'           => 'Vai trò không hợp lệ',
         ];

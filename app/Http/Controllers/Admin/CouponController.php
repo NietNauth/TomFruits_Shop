@@ -12,7 +12,17 @@ class CouponController extends Controller
 {
     public function index(Request $request)
     {
-        $coupons = Coupon::orderBy('id', 'desc')->paginate($request->get('per_page', 15));
+        $query = Coupon::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+
+        $coupons = $query->orderBy('id', 'desc')->paginate($request->get('per_page', 15));
 
         return response()->json([
             'success' => true,
