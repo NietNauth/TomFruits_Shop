@@ -61,20 +61,20 @@ export default function AiSuggestModal({ open, onClose }) {
 
       // ── BƯỚC 2: TÌM KIẾM SẢN PHẨM ──────────────────────────────────────────
       let searchList = [...keywords];
-      
+
       // Nếu không có keywords từ AI, dùng query trực tiếp
       if (searchList.length === 0 && q) searchList = [q];
 
-      const searchPromises = searchList.slice(0, 6).map(kw => 
-        productService.getAll({ 
-          search: kw, 
+      const searchPromises = searchList.slice(0, 6).map((kw) =>
+        productService.getAll({
+          search: kw,
           per_page: 5,
-          status: 'active' 
+          status: 'active',
         })
       );
-      
+
       const results = await Promise.all(searchPromises);
-      results.forEach(res => {
+      results.forEach((res) => {
         if (res.data?.data) {
           finalProducts = [...finalProducts, ...res.data.data];
         }
@@ -82,17 +82,21 @@ export default function AiSuggestModal({ open, onClose }) {
 
       // Nếu vẫn chưa có sản phẩm nào, thử tìm kiếm từng từ đơn (trừ các từ quá chung chung)
       if (finalProducts.length === 0 && q.length > 2) {
-        const words = q.split(' ').filter(w => w.length > 2);
-        const fallbackRes = await productService.getAll({ search: words[0], per_page: 5 });
+        const words = q.split(' ').filter((w) => w.length > 2);
+        const fallbackRes = await productService.getAll({
+          search: words[0],
+          per_page: 5,
+        });
         if (fallbackRes.data?.data) {
           finalProducts = fallbackRes.data.data;
         }
       }
 
-
       // Deduplicate
-      const uniqueProducts = Array.from(new Map(finalProducts.map(p => [p.id, p])).values());
-      
+      const uniqueProducts = Array.from(
+        new Map(finalProducts.map((p) => [p.id, p])).values()
+      );
+
       setProducts(uniqueProducts.slice(0, 8));
       setSearched(true);
     } catch (error) {
@@ -102,7 +106,7 @@ export default function AiSuggestModal({ open, onClose }) {
         text: error.message || 'Có lỗi xảy ra khi gọi trợ lý AI. Vui lòng kiểm tra lại!',
         icon: 'error',
         confirmButtonColor: '#ef4444',
-        confirmButtonText: 'Đồng ý'
+        confirmButtonText: 'Đồng ý',
       });
     } finally {
       setLoading(false);
@@ -118,7 +122,7 @@ export default function AiSuggestModal({ open, onClose }) {
   return (
     <div
       className={styles.overlay}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      // onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className={styles.modal}>
         <div className={styles.header}>
@@ -147,15 +151,25 @@ export default function AiSuggestModal({ open, onClose }) {
               placeholder='Bạn muốn nấu món gì hay cần tư vấn gì không?'
             />
             <button className={styles.searchBtn} onClick={handleSuggest}>
-              <svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='#fff' strokeWidth='2.5'>
-                <path d='m21 21-4.35-4.35' /><circle cx='11' cy='11' r='8' />
+              <svg
+                width='14'
+                height='14'
+                viewBox='0 0 24 24'
+                fill='none'
+                stroke='#fff'
+                strokeWidth='2.5'
+              >
+                <path d='m21 21-4.35-4.35' />
+                <circle cx='11' cy='11' r='8' />
               </svg>
             </button>
           </div>
 
-          <div className={styles.filterGroup}>
+          {/* <div className={styles.filterGroup}>
             <div className={styles.filterLabel}>
-              <span className={`${styles.filterLabelIcon} ${styles.food}`}>🥦</span>
+              <span className={`${styles.filterLabelIcon} ${styles.food}`}>
+                🥦
+              </span>
               Loại thực phẩm
             </div>
             <div className={styles.chips}>
@@ -169,23 +183,24 @@ export default function AiSuggestModal({ open, onClose }) {
                 </span>
               ))}
             </div>
-          </div>
-
+          </div> */}
 
           {loading && (
             <div className={styles.loading}>
-               <div className={styles.spinner}></div>
-               Tom Bot đang suy nghĩ...
+              <div className={styles.spinner}></div>
+              Tom Bot đang suy nghĩ...
             </div>
           )}
 
           {!loading && (aiMessage || products.length > 0) && (
             <div className={styles.aiResultArea}>
               <div className={styles.sep} />
-              
+
               {aiMessage && (
                 <div className={styles.aiBubble}>
-                   <p className={styles.aiText}><strong>Tom Bot:</strong> {aiMessage}</p>
+                  <p className={styles.aiText}>
+                    <strong>Tom Bot:</strong> {aiMessage}
+                  </p>
                 </div>
               )}
 
@@ -200,7 +215,9 @@ export default function AiSuggestModal({ open, onClose }) {
                 <>
                   <div className={styles.resultHeader}>
                     <div className={styles.resultDot} />
-                    <span className={styles.resultTitle}>Sản phẩm gợi ý cho bạn</span>
+                    <span className={styles.resultTitle}>
+                      Sản phẩm gợi ý cho bạn
+                    </span>
                   </div>
 
                   <div className={styles.productGrid}>

@@ -9,7 +9,7 @@ import cartService from '../../apis/cartService';
 import { useAuth } from '../../contexts/AuthContext';
 import { MapPin, CreditCard, CheckCircle, Plus } from 'lucide-react';
 import AddressModal from './AddressModal';
-
+import Swal from 'sweetalert2';
 // ─── Constants ───────────────────────────────────────────────────────────────
 const SHIPPING_FEE = 30000;
 const FREE_SHIP_THRESHOLD = 500000;
@@ -29,7 +29,8 @@ function CheckoutPage() {
   // ── Cart data ──
   const buyNowData = location.state;
   const [cartItems, setCartItems] = useState(() => {
-    if (buyNowData) return [{ ...buyNowData.product, quantity: buyNowData.quantity }];
+    if (buyNowData)
+      return [{ ...buyNowData.product, quantity: buyNowData.quantity }];
     return JSON.parse(localStorage.getItem('cart')) || [];
   });
 
@@ -88,12 +89,12 @@ function CheckoutPage() {
             navigate('/cart');
             return;
           }
-          const normalized = res.data.map(item => {
+          const normalized = res.data.map((item) => {
             const product = item.product || item;
             return {
               ...product,
               quantity: item.quantity || 1,
-              cartItemId: item.id
+              cartItemId: item.id,
             };
           });
           setCartItems(normalized);
@@ -114,16 +115,15 @@ function CheckoutPage() {
     }
   }, [isLoggedIn, buyNowData, navigate]);
 
-
   const formatAddressDisplay = (addr) => {
     const parts = [
       addr.receiver_name,
       addr.address_detail,
       addr.ward,
       addr.district,
-      addr.province
-    ].filter(p => p && p !== 'Chưa cập nhật' && p !== '');
-    
+      addr.province,
+    ].filter((p) => p && p !== 'Chưa cập nhật' && p !== '');
+
     return parts.join(' - ') || 'Địa chỉ chưa đầy đủ';
   };
 
@@ -135,8 +135,9 @@ function CheckoutPage() {
       tinh: addr.province === 'Chưa cập nhật' ? '' : addr.province,
       quan: addr.district === 'Chưa cập nhật' ? '' : addr.district,
       phuong: addr.ward === 'Chưa cập nhật' ? '' : addr.ward,
-      address: addr.address_detail === 'Chưa cập nhật' ? '' : addr.address_detail,
-      tinhCode: '', 
+      address:
+        addr.address_detail === 'Chưa cập nhật' ? '' : addr.address_detail,
+      tinhCode: '',
       quanCode: '',
       phuongCode: '',
     }));
@@ -150,7 +151,13 @@ function CheckoutPage() {
         ...f,
         fullName: user?.name || '',
         phone: user?.phone || '',
-        tinh: '', tinhCode: '', quan: '', quanCode: '', phuong: '', phuongCode: '', address: ''
+        tinh: '',
+        tinhCode: '',
+        quan: '',
+        quanCode: '',
+        phuong: '',
+        phuongCode: '',
+        address: '',
       }));
     } else {
       const addr = userAddresses.find((a) => a.id === parseInt(id));
@@ -187,7 +194,13 @@ function CheckoutPage() {
 
   const handleSubmit = () => {
     if (!selectedAddressId) {
-      alert('Vui lòng chọn địa chỉ giao hàng');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Chưa chọn địa chỉ',
+        text: 'Vui lòng chọn địa chỉ giao hàng!',
+        confirmButtonColor: '#22c55e',
+        width: '320px',
+      });
       return;
     }
 
@@ -214,7 +227,10 @@ function CheckoutPage() {
     return item.image_url || item.img || '/placeholder.png';
   };
 
-  const fmt = (n) => Math.round(n || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + 'đ';
+  const fmt = (n) =>
+    Math.round(n || 0)
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ',') + 'đ';
 
   return (
     <>
@@ -238,7 +254,9 @@ function CheckoutPage() {
                   <s.Icon size={14} />
                   <span>{s.label}</span>
                 </div>
-                {idx < steps.length - 1 && <span className={styles.stepArrow}>›</span>}
+                {idx < steps.length - 1 && (
+                  <span className={styles.stepArrow}>›</span>
+                )}
               </div>
             ))}
           </div>
@@ -261,22 +279,45 @@ function CheckoutPage() {
               {/* Saved Addresses Section */}
               {isLoggedIn && (
                 <div style={{ marginBottom: '24px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <label style={{ fontWeight: 600, fontSize: '0.95rem' }}>Địa chỉ nhận hàng</label>
-                    <button 
-                      type="button"
-                      className={styles.editBtn} 
-                      style={{ color: '#27ae60', fontSize: '0.85rem', fontWeight: 700 }}
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      marginBottom: '12px',
+                    }}
+                  >
+                    <label style={{ fontWeight: 600, fontSize: '0.95rem' }}>
+                      Địa chỉ nhận hàng
+                    </label>
+                    <button
+                      type='button'
+                      className={styles.editBtn}
+                      style={{
+                        color: '#27ae60',
+                        fontSize: '0.85rem',
+                        fontWeight: 700,
+                      }}
                       onClick={() => setIsModalOpen(true)}
                     >
                       THAY ĐỔI
                     </button>
                   </div>
-                  
+
                   {selectedAddressId !== 'new' ? (
-                    <div className={styles.infoBox} style={{ border: '1.5px solid #eafaf1', background: '#fbfdfc', cursor: 'pointer' }} onClick={() => setIsModalOpen(true)}>
+                    <div
+                      className={styles.infoBox}
+                      style={{
+                        border: '1.5px solid #eafaf1',
+                        background: '#fbfdfc',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => setIsModalOpen(true)}
+                    >
                       <div className={styles.addrHeader}>
-                        <span className={styles.senderName}>{form.fullName}</span>
+                        <span className={styles.senderName}>
+                          {form.fullName}
+                        </span>
                         <span className={styles.senderPhone}>{form.phone}</span>
                       </div>
                       <div className={styles.addrDetail}>
@@ -284,8 +325,8 @@ function CheckoutPage() {
                       </div>
                     </div>
                   ) : (
-                    <button 
-                      type="button"
+                    <button
+                      type='button'
                       className={styles.addAddressBtn}
                       onClick={() => setIsModalOpen(true)}
                       style={{ width: '100%', marginTop: '0' }}
@@ -296,12 +337,11 @@ function CheckoutPage() {
                 </div>
               )}
 
-
               {/* Ghi chú */}
               <div className={styles.formGroup}>
                 <label>Ghi chú đơn hàng</label>
                 <textarea
-                  placeholder="Ví dụ: Giao buổi sáng trước 10h, gọi trước khi giao..."
+                  placeholder='Ví dụ: Giao buổi sáng trước 10h, gọi trước khi giao...'
                   rows={4}
                   value={form.note}
                   onChange={handleChange('note')}
@@ -310,10 +350,13 @@ function CheckoutPage() {
 
               {/* Actions */}
               <div className={styles.formActions}>
-                <div className={styles.backLink} onClick={() => navigate('/cart')}>
+                <div
+                  className={styles.backLink}
+                  onClick={() => navigate('/cart')}
+                >
                   ← Quay lại giỏ hàng
                 </div>
-                <button type="submit" className={styles.continueBtn}>
+                <button type='submit' className={styles.continueBtn}>
                   Tiếp tục →
                 </button>
               </div>
@@ -323,7 +366,9 @@ function CheckoutPage() {
           {/* RIGHT - ORDER SUMMARY */}
           <div className={styles.right}>
             <div className={styles.summary}>
-              <div className={styles.summaryHeader}>Đơn hàng ({cartItems.length})</div>
+              <div className={styles.summaryHeader}>
+                Đơn hàng ({cartItems.length})
+              </div>
 
               <div className={styles.summaryBody}>
                 <div className={styles.orderItems}>
@@ -331,11 +376,15 @@ function CheckoutPage() {
                     <div key={item.id} className={styles.orderItem}>
                       <div className={styles.orderItemThumb}>
                         <img src={getImageUrl(item)} alt={item.name} />
-                        <span className={styles.orderItemQtyBadge}>{item.quantity}</span>
+                        <span className={styles.orderItemQtyBadge}>
+                          {item.quantity}
+                        </span>
                       </div>
                       <div className={styles.orderItemInfo}>
                         <div className={styles.orderItemName}>{item.name}</div>
-                        <div className={styles.orderItemPrice}>{fmt((item.price || 0) * item.quantity)}</div>
+                        <div className={styles.orderItemPrice}>
+                          {fmt((item.price || 0) * item.quantity)}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -348,7 +397,9 @@ function CheckoutPage() {
                 </div>
                 <div className={styles.row}>
                   <span>Phí vận chuyển</span>
-                  <span>{shippingFee === 0 ? 'Miễn phí' : fmt(SHIPPING_FEE)}</span>
+                  <span>
+                    {shippingFee === 0 ? 'Miễn phí' : fmt(SHIPPING_FEE)}
+                  </span>
                 </div>
                 <div className={styles.divider} />
 
@@ -357,7 +408,9 @@ function CheckoutPage() {
                   <span className={styles.totalAmount}>{fmt(total)}</span>
                 </div>
 
-                <div className={styles.trust}>🔒 Bảo mật SSL &nbsp;|&nbsp; ✓ Đảm bảo hoàn tiền</div>
+                <div className={styles.trust}>
+                  🔒 Bảo mật SSL &nbsp;|&nbsp; ✓ Đảm bảo hoàn tiền
+                </div>
               </div>
             </div>
           </div>
@@ -365,7 +418,7 @@ function CheckoutPage() {
       </div>
       <MyFooter />
 
-      <AddressModal 
+      <AddressModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         addresses={userAddresses}

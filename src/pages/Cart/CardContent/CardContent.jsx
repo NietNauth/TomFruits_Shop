@@ -20,14 +20,20 @@ function CartContent({ cartItems, setCartItems }) {
 
   const formatPrice = (value) => {
     if (value === undefined || value === null) return '0đ';
-    return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + 'đ';
+    return (
+      Math.round(value)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',') + 'đ'
+    );
   };
 
   const pendingUpdates = useRef({});
 
   const changeQty = (item, newQty) => {
     // 1. Cập nhật UI cục bộ ngay lập tức để người dùng thấy số lượng và giá thay đổi không trễ
-    setCartItems(prev => prev.map(x => x.id === item.id ? { ...x, quantity: newQty } : x));
+    setCartItems((prev) =>
+      prev.map((x) => (x.id === item.id ? { ...x, quantity: newQty } : x))
+    );
 
     // 2. Debounce cuộc gọi API đồng bộ CSDL
     if (pendingUpdates.current[item.id]) {
@@ -63,7 +69,9 @@ function CartContent({ cartItems, setCartItems }) {
 
   const handleQtyChange = (item, valStr) => {
     if (valStr === '') {
-      setCartItems(prev => prev.map(x => x.id === item.id ? { ...x, quantity: '' } : x));
+      setCartItems((prev) =>
+        prev.map((x) => (x.id === item.id ? { ...x, quantity: '' } : x))
+      );
       return;
     }
 
@@ -138,6 +146,16 @@ function CartContent({ cartItems, setCartItems }) {
       setCouponMessage({ text: '✗ Mã không hợp lệ!', type: 'error' });
     }
   };
+  const [inputValues, setInputValues] = useState({});
+  useEffect(() => {
+    const values = {};
+
+    cartItems.forEach((item) => {
+      values[item.id] = item.quantity;
+    });
+
+    setInputValues(values);
+  }, [cartItems]);
   return (
     <>
       <MyHeader />
@@ -164,7 +182,13 @@ function CartContent({ cartItems, setCartItems }) {
                 <div key={item.id} className={styles.item}>
                   {/* PRODUCT */}
                   <div className={styles.product}>
-                    <img src={item.img || 'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%20viewBox%3D%220%200%20150%20150%22%3E%3Crect%20width%3D%22150%22%20height%3D%22150%22%20fill%3D%22%23f3f4f6%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%239ca3af%22%20font-family%3D%22sans-serif%22%20font-size%3D%2214%22%3ENo%20Img%3C%2Ftext%3E%3C%2Fsvg%3E'} alt={item.name} />
+                    <img
+                      src={
+                        item.img ||
+                        'data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%20viewBox%3D%220%200%20150%20150%22%3E%3Crect%20width%3D%22150%22%20height%3D%22150%22%20fill%3D%22%23f3f4f6%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%20fill%3D%22%239ca3af%22%20font-family%3D%22sans-serif%22%20font-size%3D%2214%22%3ENo%20Img%3C%2Ftext%3E%3C%2Fsvg%3E'
+                      }
+                      alt={item.name}
+                    />
                     <div className={styles.info}>
                       <div className={styles.name}>{item.name}</div>
                       <div className={styles.category}>{item.category}</div>
@@ -173,30 +197,33 @@ function CartContent({ cartItems, setCartItems }) {
                   </div>
 
                   {/* PRICE */}
-                  <div className={styles.price}>
-                    {formatPrice(item.price)}
-                  </div>
+                  <div className={styles.price}>{formatPrice(item.price)}</div>
 
                   {/* QUANTITY + DELETE */}
-                    <div className={styles.quantityWrap}>
+                  <div className={styles.quantityWrap}>
                     <div className={styles.quantity}>
                       <button onClick={() => decreaseQty(item)}>−</button>
-                      <input 
-                        type="number" 
-                        value={item.quantity} 
+                      <input
+                        type='number'
+                        value={item.quantity}
                         onChange={(e) => handleQtyChange(item, e.target.value)}
                         onBlur={() => handleQtyBlur(item)}
                         min={1}
                         max={item.stock}
                       />
-                      <button 
+                      <button
                         onClick={() => increaseQty(item)}
                         disabled={item.quantity >= item.stock}
-                        style={{ 
-                          cursor: item.quantity >= item.stock ? 'not-allowed' : 'pointer',
-                          opacity: item.quantity >= item.stock ? 0.5 : 1 
+                        style={{
+                          cursor:
+                            item.quantity >= item.stock
+                              ? 'not-allowed'
+                              : 'pointer',
+                          opacity: item.quantity >= item.stock ? 0.5 : 1,
                         }}
-                      >+</button>
+                      >
+                        +
+                      </button>
                     </div>
                     <button
                       className={styles.deleteBtn}
@@ -264,16 +291,13 @@ function CartContent({ cartItems, setCartItems }) {
                 <div className={styles.row}>
                   <span>Phí vận chuyển</span>
                   <span>
-                    {shippingFee === 0
-                      ? 'Miễn phí'
-                      : formatPrice(shippingFee)}
+                    {shippingFee === 0 ? 'Miễn phí' : formatPrice(shippingFee)}
                   </span>
                 </div>
 
                 {remaining > 0 && (
                   <div className={styles.freeShipHint}>
-                    Mua thêm {formatPrice(remaining)} để được miễn
-                    phí ship
+                    Mua thêm {formatPrice(remaining)} để được miễn phí ship
                   </div>
                 )}
 

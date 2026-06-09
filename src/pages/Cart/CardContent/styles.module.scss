@@ -116,16 +116,16 @@
 .quantity {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 8px;
   border: 1px solid #e0e0e0;
   border-radius: 999px;
   padding: 4px 12px;
   background: #fff;
-
+  height: 30px;
   button {
     width: 26px;
     height: 26px;
-    border-radius: 0;
     border: none;
     background: none;
     color: #16a34a;
@@ -134,7 +134,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
+    line-height: 1;
+    padding: 0;
+    gap: 8px;
     &:hover {
       color: #15803d;
       background: #f0fdf4;
@@ -162,7 +164,33 @@
     }
   }
 }
+.quantity input {
+  width: 24px;
+  height: 22px;
 
+  border: none;
+  background: transparent;
+
+  text-align: center;
+
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 22px;
+
+  padding: 0;
+  margin: 0;
+
+  outline: none;
+
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 .deleteBtn {
   background: none;
   border: none;

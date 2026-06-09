@@ -45,7 +45,9 @@ function DetailProduct() {
         const productRes = await productService.getById(id);
         setProduct(productRes.data);
         if (productRes.data?.category_id) {
-          const relatedRes = await productService.getByCategory(productRes.data.category_id);
+          const relatedRes = await productService.getByCategory(
+            productRes.data.category_id
+          );
           setRelatedProducts(relatedRes.data?.data || []);
         }
       } catch (err) {
@@ -83,7 +85,7 @@ function DetailProduct() {
         <MyFooter />
       </div>
     );
-  
+
   const imgUrl = product.image_url;
   return (
     <div>
@@ -96,28 +98,46 @@ function DetailProduct() {
             </div>
           </div>
 
-          <div className={contentSection} style={{ opacity: product.status === 'out_of_stock' ? 0.8 : 1 }}>
+          <div
+            className={contentSection}
+            style={{ opacity: product.status === 'out_of_stock' ? 0.8 : 1 }}
+          >
             <div className={imageBox}>
-              <img src={imgUrl} alt={product.name} style={{ filter: product.status === 'out_of_stock' ? 'grayscale(0.8)' : 'none' }} />
+              <img
+                src={imgUrl}
+                alt={product.name}
+                style={{
+                  filter:
+                    product.status === 'out_of_stock'
+                      ? 'grayscale(0.8)'
+                      : 'none',
+                }}
+              />
               {product.status === 'out_of_stock' && (
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'rgba(255,255,255,0.5)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 2,
-                }}>
-                  <span style={{
-                    background: 'rgba(0,0,0,0.7)',
-                    color: '#fff',
-                    padding: '10px 30px',
-                    borderRadius: '4px',
-                    fontWeight: 'bold',
-                    textTransform: 'uppercase',
-                    fontSize: '20px'
-                  }}>Hết hàng</span>
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(255,255,255,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 2,
+                  }}
+                >
+                  <span
+                    style={{
+                      background: 'rgba(0,0,0,0.7)',
+                      color: '#fff',
+                      padding: '10px 30px',
+                      borderRadius: '4px',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      fontSize: '20px',
+                    }}
+                  >
+                    Hết hàng
+                  </span>
                 </div>
               )}
               {product.discount > 0 && (
@@ -141,40 +161,79 @@ function DetailProduct() {
               <h1>{product.name}</h1>
               <div className={styles.price}>
                 <div className={styles.currentPrice}>
-                  <h2>{Math.round(product.price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}đ</h2>
+                  <h2>
+                    {Math.round(product.price)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    đ
+                  </h2>
                   <span>/ {product.unit}</span>
                 </div>
 
                 {product.old_price && (
                   <div className={styles.priceSub}>
                     <span className={styles.oldPrice}>
-                      {Math.round(product.old_price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}đ
+                      {Math.round(product.old_price)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                      đ
                     </span>
                     <span className={styles.save}>
                       Tiết kiệm{' '}
-                      {Math.round(product.old_price - product.price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}đ
+                      {Math.round(product.old_price - product.price)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                      đ
                     </span>
                   </div>
                 )}
               </div>
               <div className={qtyWrapper}>
                 <p className={qtyLabel}>Số lượng</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <div
+                  style={{ display: 'flex', alignItems: 'center', gap: '15px' }}
+                >
                   <div className={qtyBox}>
-                    <button onClick={() => setQty(qty > 1 ? qty - 1 : 1)} disabled={product.status === 'out_of_stock'}>
+                    <button
+                      onClick={() => setQty(qty > 1 ? qty - 1 : 1)}
+                      disabled={product.status === 'out_of_stock'}
+                    >
                       -
                     </button>
                     <span>{qty}</span>
-                    <button onClick={() => setQty(qty < product.quantity ? qty + 1 : qty)} disabled={product.status === 'out_of_stock' || qty >= product.quantity}>+</button>
+                    <button
+                      onClick={() =>
+                        setQty(qty < product.quantity ? qty + 1 : qty)
+                      }
+                      disabled={
+                        product.status === 'out_of_stock' ||
+                        qty >= product.quantity
+                      }
+                    >
+                      +
+                    </button>
                   </div>
-                  <span style={{ color: '#6b7280', fontSize: '14px', fontWeight: '400' }}>
-                    {product.quantity > 0 ? `Còn ${product.quantity} sản phẩm` : 'Hết hàng'}
+                  <span
+                    style={{
+                      color: '#6b7280',
+                      fontSize: '14px',
+                      fontWeight: '400',
+                    }}
+                  >
+                    {product.quantity > 0
+                      ? `Còn ${product.quantity} sản phẩm`
+                      : 'Hết hàng'}
                   </span>
                 </div>
               </div>
               <p className={styles.totalBar}>
                 Tổng tiền:{' '}
-                <b>{Math.round(product ? product.price * qty : 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}đ</b>
+                <b>
+                  {Math.round(product ? product.price * qty : 0)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  đ
+                </b>
               </p>
 
               {/* BUTTON */}
@@ -182,10 +241,14 @@ function DetailProduct() {
                 <button
                   className={styles.btnPrimary}
                   disabled={product.status === 'out_of_stock'}
-                  style={{ 
-                    background: product.status === 'out_of_stock' ? '#999' : '#16a34a',
-                    cursor: product.status === 'out_of_stock' ? 'not-allowed' : 'pointer',
-                    opacity: product.status === 'out_of_stock' ? 0.7 : 1
+                  style={{
+                    background:
+                      product.status === 'out_of_stock' ? '#999' : '#16a34a',
+                    cursor:
+                      product.status === 'out_of_stock'
+                        ? 'not-allowed'
+                        : 'pointer',
+                    opacity: product.status === 'out_of_stock' ? 0.7 : 1,
                   }}
                   onClick={() =>
                     addToCart({
@@ -200,14 +263,19 @@ function DetailProduct() {
                   }
                 >
                   <FaShoppingCart />
-                  {product.status === 'out_of_stock' ? 'Hết hàng' : 'Thêm vào giỏ hàng'}
+                  {product.status === 'out_of_stock'
+                    ? 'Hết hàng'
+                    : 'Thêm vào giỏ hàng'}
                 </button>
-                <button 
-                  className={styles.btnOutline} 
+                <button
+                  className={styles.btnOutline}
                   disabled={product.status === 'out_of_stock'}
-                  style={{ 
-                    cursor: product.status === 'out_of_stock' ? 'not-allowed' : 'pointer',
-                    opacity: product.status === 'out_of_stock' ? 0.7 : 1
+                  style={{
+                    cursor:
+                      product.status === 'out_of_stock'
+                        ? 'not-allowed'
+                        : 'pointer',
+                    opacity: product.status === 'out_of_stock' ? 0.7 : 1,
                   }}
                   onClick={handleBuyNow}
                 >
@@ -249,17 +317,23 @@ function DetailProduct() {
 
             <div className={tabContent}>
               {activeTab === 'desc' && (
-                <div 
+                <div
                   className={styles.richText}
-                  dangerouslySetInnerHTML={{ __html: product?.description }} 
+                  dangerouslySetInnerHTML={{
+                    __html: product?.description?.replace(/\s+/g, ' ').trim(),
+                  }}
                 />
               )}
               {activeTab === 'nutri' && (
                 <div className={styles.nutriBox}>
                   {product?.nutritional_info ? (
-                    <div 
+                    <div
                       className={styles.richText}
-                      dangerouslySetInnerHTML={{ __html: product.nutritional_info }} 
+                      dangerouslySetInnerHTML={{
+                        __html: product.nutritional_info
+                          ?.replace(/\s+/g, ' ')
+                          .trim(),
+                      }}
                     />
                   ) : (
                     <p>Chưa có thông tin dinh dưỡng.</p>
@@ -270,12 +344,22 @@ function DetailProduct() {
           </div>
 
           <div className={related}>
-            <h3 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '20px' }}>Sản phẩm liên quan</h3>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', 
-              gap: '20px' 
-            }}>
+            <h3
+              style={{
+                fontSize: '24px',
+                fontWeight: '700',
+                marginBottom: '20px',
+              }}
+            >
+              Sản phẩm liên quan
+            </h3>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))',
+                gap: '20px',
+              }}
+            >
               {relatedProducts.slice(0, 4).map((item) => (
                 <ProductCard
                   key={item.id}

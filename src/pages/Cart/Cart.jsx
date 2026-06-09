@@ -34,13 +34,18 @@ function Cart() {
       }
     };
     fetchCart();
-    
+
     const handleCartUpdate = () => fetchCart();
     window.addEventListener('cartUpdated', handleCartUpdate);
     return () => window.removeEventListener('cartUpdated', handleCartUpdate);
   }, [isLoggedIn]);
 
-  if (isLoading) return <div style={{padding: 50, textAlign: 'center'}}>Đang tải giỏ hàng...</div>;
+  if (isLoading)
+    return (
+      <div style={{ padding: 50, textAlign: 'center' }}>
+        Đang tải giỏ hàng...
+      </div>
+    );
 
   return (
     <div>

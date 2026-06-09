@@ -11,7 +11,7 @@ export const addToCart = async (product) => {
   console.log('--- addToCart called ---', product);
   try {
     const qtyToAdd = product.quantity || 1;
-    
+
     if (storage.isLoggedIn()) {
       console.log('Logged in mode. Calling API...');
       await cartService.addItem(product.id, qtyToAdd);
@@ -20,7 +20,7 @@ export const addToCart = async (product) => {
       const cart = storage.getCart();
       const existing = cart.find((item) => item.id === product.id);
       const stock = product.stock || 999;
-      
+
       if (existing) {
         const newQty = (existing.quantity || 1) + qtyToAdd;
         if (newQty > stock) {
@@ -29,7 +29,7 @@ export const addToCart = async (product) => {
             text: `Số lượng sản phẩm vượt quá tồn kho hiện tại (Tối đa còn lại: ${stock})`,
             icon: 'warning',
             confirmButtonText: 'Đồng ý',
-            confirmButtonColor: '#f59e0b'
+            confirmButtonColor: '#f59e0b',
           });
           return;
         }
@@ -41,7 +41,7 @@ export const addToCart = async (product) => {
             text: `Số lượng sản phẩm vượt quá tồn kho hiện tại (Tối đa còn lại: ${stock})`,
             icon: 'warning',
             confirmButtonText: 'Đồng ý',
-            confirmButtonColor: '#f59e0b'
+            confirmButtonColor: '#f59e0b',
           });
           return;
         }
@@ -49,7 +49,7 @@ export const addToCart = async (product) => {
       }
       storage.setCart(cart);
     }
-    
+
     window.dispatchEvent(new Event('cartUpdated'));
     console.log('Event cartUpdated dispatched');
     Swal.fire({
@@ -60,7 +60,7 @@ export const addToCart = async (product) => {
       confirmButtonColor: '#10b981',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Xem giỏ hàng',
-      cancelButtonText: 'Tiếp tục mua sắm'
+      cancelButtonText: 'Tiếp tục mua sắm',
     }).then((result) => {
       if (result.isConfirmed) {
         window.location.href = '/cart';
@@ -73,7 +73,7 @@ export const addToCart = async (product) => {
       text: 'Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại!',
       icon: 'error',
       confirmButtonText: 'Đồng ý',
-      confirmButtonColor: '#ef4444'
+      confirmButtonColor: '#ef4444',
     });
   }
 };
@@ -99,7 +99,11 @@ export const removeFromCart = async (productId, cartItemId = null) => {
 /**
  * Cập nhật số lượng item (localStorage hoặc Server)
  */
-export const updateCartQuantity = async (productId, quantity, cartItemId = null) => {
+export const updateCartQuantity = async (
+  productId,
+  quantity,
+  cartItemId = null
+) => {
   if (storage.isLoggedIn() && cartItemId) {
     try {
       await cartService.updateItem(cartItemId, quantity);
@@ -108,9 +112,9 @@ export const updateCartQuantity = async (productId, quantity, cartItemId = null)
     }
   } else {
     // Local fallback
-    const cart = storage.getCart().map((item) =>
-      item.id === productId ? { ...item, quantity } : item
-    );
+    const cart = storage
+      .getCart()
+      .map((item) => (item.id === productId ? { ...item, quantity } : item));
     storage.setCart(cart);
   }
   window.dispatchEvent(new Event('cartUpdated'));

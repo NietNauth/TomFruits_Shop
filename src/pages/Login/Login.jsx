@@ -37,7 +37,7 @@ function Login() {
         text: 'Chào mừng bạn quay trở lại với Tom Fruits!',
         icon: 'success',
         confirmButtonColor: '#10b981',
-        confirmButtonText: 'Đồng ý'
+        confirmButtonText: 'Đồng ý',
       }).then(() => {
         navigate('/');
       });

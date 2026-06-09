@@ -14,39 +14,63 @@ function ProductListPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
-  
+
   const keywordFromUrl = params.get('keyword') || params.get('search') || '';
   const categoryFromUrlRaw = params.get('category');
-  const categoryFromUrl = categoryFromUrlRaw ? decodeURIComponent(categoryFromUrlRaw) : '';
+  const categoryFromUrl = categoryFromUrlRaw
+    ? decodeURIComponent(categoryFromUrlRaw)
+    : '';
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [filters, setFilters] = useState({ search: keywordFromUrl, category_id: categoryFromUrl, page: 1, sort: 'default' });
-  const [pagination, setPagination] = useState({ current_page: 1, last_page: 1 });
+  const [filters, setFilters] = useState({
+    search: keywordFromUrl,
+    category_id: categoryFromUrl,
+    page: 1,
+    sort: 'default',
+  });
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    last_page: 1,
+  });
 
   // Load danh mục
   useEffect(() => {
-    categoryService.getAll().then((res) => setCategories(res.data?.data || res.data || []));
+    categoryService
+      .getAll()
+      .then((res) => setCategories(res.data?.data || res.data || []));
   }, []);
 
   // Sync params từ url
   useEffect(() => {
     if (categoryFromUrl || keywordFromUrl) {
-      setFilters((f) => ({ ...f, category_id: categoryFromUrl, search: keywordFromUrl, page: 1 }));
+      setFilters((f) => ({
+        ...f,
+        category_id: categoryFromUrl,
+        search: keywordFromUrl,
+        page: 1,
+      }));
     }
   }, [categoryFromUrl, keywordFromUrl]);
 
   // Load sản phẩm
   useEffect(() => {
-    productService.getAll(filters).then((res) => {
-      setProducts(res.data?.data || []);
-      const total = res.data?.total || 0;
-      const perPage = res.data?.per_page || PAGE_SIZE;
-      setPagination({ 
-        current_page: res.data?.current_page || 1, 
-        last_page: res.data?.last_page || Math.ceil(total / perPage) || 1
-      });
-    }).catch(console.error);
+    // productService.getAll(filters).then((res) => {
+    productService
+      .getAll({
+        ...filters,
+        per_page: PAGE_SIZE, // thêm dòng này
+      })
+      .then((res) => {
+        setProducts(res.data?.data || []);
+        const total = res.data?.total || 0;
+        const perPage = res.data?.per_page || PAGE_SIZE;
+        setPagination({
+          current_page: res.data?.current_page || 1,
+          last_page: res.data?.last_page || Math.ceil(total / perPage) || 1,
+        });
+      })
+      .catch(console.error);
   }, [filters]);
 
   const [price, setPrice] = useState({ min: 0, max: 500000 });
@@ -77,7 +101,9 @@ function ProductListPage() {
             <span>SẮP XẾP THEO:</span>
             <select
               className={styles.select}
-              onChange={(e) => setFilters((f) => ({ ...f, sort: e.target.value, page: 1 }))}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, sort: e.target.value, page: 1 }))
+              }
               value={filters.sort}
             >
               <option value='default'>Mặc định</option>
@@ -97,7 +123,11 @@ function ProductListPage() {
               <h4>Danh mục</h4>
               <ul>
                 <li
-                  className={selectedCategory === 'Tất cả' || !selectedCategory ? active : ''}
+                  className={
+                    selectedCategory === 'Tất cả' || !selectedCategory
+                      ? active
+                      : ''
+                  }
                   onClick={() => handleCategoryFilter('')}
                 >
                   <span>Tất cả</span>
@@ -106,7 +136,12 @@ function ProductListPage() {
                 {categories.map((item) => (
                   <li
                     key={item.id}
-                    className={selectedCategory == item.id || selectedCategory == item.title ? active : ''}
+                    className={
+                      selectedCategory == item.id ||
+                      selectedCategory == item.title
+                        ? active
+                        : ''
+                    }
                     onClick={() => handleCategoryFilter(item.id)}
                   >
                     <span>{item.title || item.name}</span>
@@ -135,7 +170,14 @@ function ProductListPage() {
                       min: Math.min(+e.target.value, price.max - 1000),
                     })
                   }
-                  onMouseUp={() => setFilters(f => ({...f, min_price: price.min, max_price: price.max, page: 1}))}
+                  onMouseUp={() =>
+                    setFilters((f) => ({
+                      ...f,
+                      min_price: price.min,
+                      max_price: price.max,
+                      page: 1,
+                    }))
+                  }
                 />
                 <input
                   type='range'
@@ -149,7 +191,14 @@ function ProductListPage() {
                       max: Math.max(+e.target.value, price.min + 1000),
                     })
                   }
-                  onMouseUp={() => setFilters(f => ({...f, min_price: price.min, max_price: price.max, page: 1}))}
+                  onMouseUp={() =>
+                    setFilters((f) => ({
+                      ...f,
+                      min_price: price.min,
+                      max_price: price.max,
+                      page: 1,
+                    }))
+                  }
                 />
               </div>
             </div>
@@ -184,7 +233,12 @@ function ProductListPage() {
               <div className={styles.pagination}>
                 <button
                   className={styles.pageBtn}
-                  onClick={() => setFilters({ ...filters, page: Math.max(filters.page - 1, 1) })}
+                  onClick={() =>
+                    setFilters({
+                      ...filters,
+                      page: Math.max(filters.page - 1, 1),
+                    })
+                  }
                   disabled={currentPage === 1}
                 >
                   ‹
@@ -205,7 +259,10 @@ function ProductListPage() {
                 <button
                   className={styles.pageBtn}
                   onClick={() =>
-                    setFilters({ ...filters, page: Math.min(filters.page + 1, totalPages) })
+                    setFilters({
+                      ...filters,
+                      page: Math.min(filters.page + 1, totalPages),
+                    })
                   }
                   disabled={currentPage === totalPages}
                 >
